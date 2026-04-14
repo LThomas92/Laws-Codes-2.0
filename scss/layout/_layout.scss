@@ -1,0 +1,312 @@
+// ============================================================
+// LAWS & CODES — LAYOUT (Nav, Footer, Marquee)
+// ============================================================
+@use '../base/variables' as *;
+
+// ── NAV ───────────────────────────────────────────────────
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $container-pad;
+  height: $nav-height;
+  background: $white;
+  border-bottom: 1px solid $navy-border;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: $shadow-xs;
+
+  @include bp-md {
+    padding: 0 $container-pad-mobile;
+  }
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  text-decoration: none;
+}
+
+.nav-logo-mark {
+  width: 34px;
+  height: 34px;
+  background: $navy;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: $shadow-navy;
+  flex-shrink: 0;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.nav-brand-name {
+  font-family: $font-serif;
+  font-size: 17px;
+  font-weight: $weight-medium;
+  color: $navy;
+  letter-spacing: 0.01em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  align-items: center;
+
+  a {
+    font-size: $text-xs;
+    font-weight: $weight-normal;
+    color: $muted;
+    letter-spacing: $tracking-wide;
+    text-transform: uppercase;
+
+    &:hover {
+      color: $navy;
+    }
+  }
+
+  @include bp-lg {
+    display: none;
+  }
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-slots-badge {
+  @include mono-label;
+  color: $navy;
+  background: $navy-light;
+  padding: 5px 12px;
+  border-radius: $radius-sm;
+  border: 1px solid $navy-border;
+}
+
+.nav-cta-btn {
+  @include navy-btn;
+  padding: 10px 22px;
+}
+
+// Mobile hamburger (shown on bp-lg)
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 6px;
+
+  span {
+    width: 22px;
+    height: 2px;
+    background: $navy;
+    border-radius: 2px;
+    transition: $transition-fast;
+  }
+
+  @include bp-lg {
+    display: flex;
+  }
+}
+
+// Mobile menu
+.nav-mobile-menu {
+  display: none;
+  position: absolute;
+  top: $nav-height;
+  left: 0;
+  right: 0;
+  background: $white;
+  border-bottom: 1px solid $navy-border;
+  padding: $space-6 $container-pad-mobile;
+  flex-direction: column;
+  gap: $space-4;
+  box-shadow: $shadow-md;
+  z-index: 99;
+
+  &.open {
+    display: flex;
+  }
+
+  a {
+    font-size: $text-base;
+    color: $navy;
+    padding: $space-3 0;
+    border-bottom: 1px solid $navy-border;
+    font-weight: $weight-medium;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+// ── MARQUEE ───────────────────────────────────────────────
+.marquee {
+  background: $navy;
+  padding: 13px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.marquee-track {
+  display: inline-flex;
+  animation: lc-ticker 32s linear infinite;
+
+  &:hover {
+    animation-play-state: paused;
+  }
+}
+
+.marquee-item {
+  @include mono-label;
+  color: rgba(255, 255, 255, 0.42);
+  padding: 0 28px;
+}
+
+.marquee-diamond {
+  color: $tan-2;
+  font-size: 8px;
+  vertical-align: top;
+}
+
+@keyframes lc-ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+// ── STATS STRIP ───────────────────────────────────────────
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid $navy-border;
+  background: $white;
+
+  @include bp-md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat-block {
+  padding: 34px 28px;
+  text-align: center;
+  border-right: 1px solid $navy-border;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  @include bp-md {
+    &:nth-child(2) { border-right: none; }
+    &:nth-child(3) { border-right: 1px solid $navy-border; }
+  }
+}
+
+.stat-number {
+  font-family: $font-serif;
+  font-size: 42px;
+  font-weight: $weight-normal;
+  color: $navy;
+  line-height: 1;
+
+  em {
+    font-style: normal;
+    color: $tan-2;
+  }
+}
+
+.stat-label {
+  @include mono-label;
+  color: $muted;
+  margin-top: 9px;
+}
+
+// ── FOOTER ────────────────────────────────────────────────
+.site-footer {
+  background: $ink;
+  padding: $space-12 $container-pad 0;
+
+  @include bp-md {
+    padding: $space-10 $container-pad-mobile 0;
+  }
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 28px;
+  padding-bottom: $space-12;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+
+  @include bp-lg {
+    grid-template-columns: 1fr 1fr;
+    gap: $space-8;
+  }
+
+  @include bp-md {
+    grid-template-columns: 1fr;
+  }
+}
+
+.footer-brand-name {
+  font-family: $font-serif;
+  font-size: 19px;
+  font-weight: $weight-normal;
+  color: $white;
+  margin-bottom: 7px;
+}
+
+.footer-brand-sub {
+  font-size: $text-sm;
+  color: rgba(255, 255, 255, 0.30);
+  line-height: $leading-relaxed;
+  font-weight: $weight-light;
+  max-width: 200px;
+}
+
+.footer-col-title {
+  @include mono-label;
+  color: $tan-2;
+  margin-bottom: 13px;
+}
+
+.footer-link {
+  font-size: $text-sm;
+  color: rgba(255, 255, 255, 0.38);
+  display: block;
+  margin-bottom: 9px;
+  font-weight: $weight-light;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.75);
+  }
+}
+
+.footer-bottom {
+  padding: 18px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @include bp-sm {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+.footer-copy {
+  @include mono-label;
+  color: rgba(255, 255, 255, 0.20);
+  letter-spacing: $tracking-wide;
+}

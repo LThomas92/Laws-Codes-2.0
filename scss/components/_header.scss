@@ -1,0 +1,10 @@
+@use 'sass:color';
+@use '../base/variables' as *;
+
+.nav-brand-name {
+  img {
+    height: 4rem;
+    object-fit: cover;
+    display: inline-block;
+  }
+}

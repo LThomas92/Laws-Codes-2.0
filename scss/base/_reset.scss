@@ -1,0 +1,145 @@
+// ============================================================
+// LAWS & CODES — BASE / RESET
+// ============================================================
+@use 'variables' as *;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: $font-sans;
+  font-size: $text-base;
+  font-weight: $weight-normal;
+  line-height: $leading-normal;
+  color: $ink;
+  background-color: $page-bg;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: $transition-fast;
+}
+
+button {
+  font-family: $font-sans;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: $font-sans;
+  font-size: $text-base;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+// ── TYPOGRAPHY DEFAULTS ───────────────────────────────────
+h1, h2, h3, h4, h5, h6 {
+  @include serif-heading;
+}
+
+h1 { font-size: $heading-hero; }
+h2 { font-size: $heading-lg; }
+h3 { font-size: $heading-md; }
+h4 { font-size: $heading-sm; }
+
+p {
+  font-size: $text-md;
+  line-height: $leading-relaxed;
+  color: $muted;
+  font-weight: $weight-light;
+}
+
+// ── UTILITY CLASSES ───────────────────────────────────────
+.container { @include container; }
+
+.section-kicker { @include section-kicker; }
+
+.serif { font-family: $font-serif; }
+.mono  { font-family: $font-mono; }
+.sans  { font-family: $font-sans; }
+
+.text-navy   { color: $navy; }
+.text-muted  { color: $muted; }
+.text-tan    { color: $tan-2; }
+.text-white  { color: $white; }
+
+.bg-white    { background: $white; }
+.bg-off      { background: $off-white; }
+.bg-soft     { background: $soft; }
+.bg-navy     { background: $navy; }
+
+.btn-navy    { @include navy-btn; }
+.btn-ghost   { @include ghost-btn; }
+
+.italic { font-style: italic; }
+.italic-tan {
+  font-style: italic;
+  color: $tan-2;
+}
+
+// ── SCREEN READER ONLY ────────────────────────────────────
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ── SECTION BASE ──────────────────────────────────────────
+.section {
+  padding: $space-18 $space-12;
+
+  @include bp-md {
+    padding: $space-12 $container-pad-mobile;
+  }
+}
+
+.section-header {
+  margin-bottom: $space-10;
+}
+
+.section-title {
+  @include serif-heading;
+  font-size: $heading-lg;
+  margin-bottom: 8px;
+}
+
+.section-sub {
+  font-size: $text-md;
+  color: $muted;
+  line-height: $leading-relaxed;
+  max-width: 480px;
+  font-weight: $weight-light;
+}
+
+// ── DIVIDERS ──────────────────────────────────────────────
+.divider {
+  border: none;
+  border-top: 1px solid $navy-border;
+}

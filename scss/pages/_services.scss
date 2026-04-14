@@ -1,0 +1,646 @@
+// =============================================================================
+// SERVICES PAGE  —  _services.scss
+// Laws & Codes · lawscodes.com
+// Import this in your main style.scss:  @use 'pages/services';
+// =============================================================================
+
+@use '../abstracts/variables' as *;   // exposes $navy, $tan, etc.
+@use '../abstracts/mixins'    as *;   // exposes respond-to(), fluid-type(), etc.
+
+// ─── CSS Custom Props (mirrors root vars) ────────────────────────────────────
+// If you don't use a variables partial, define them here:
+:root {
+  --navy:        #070945;
+  --navy-light:  rgba(7, 9, 69, 0.06);
+  --navy-mid:    rgba(7, 9, 69, 0.10);
+  --navy-border: rgba(7, 9, 69, 0.12);
+  --tan:         #E8CCB2;
+  --tan2:        #c9a882;
+  --tan3:        #f5ead8;
+  --white:       #ffffff;
+  --off:         #f9f8f5;
+  --soft:        #f3f2ee;
+  --ink:         #0d0d1a;
+  --muted:       #6b6b7e;
+  --light:       #e4e4ec;
+  --serif:       'Playfair Display', Georgia, serif;
+  --sans:        'Inter', system-ui, sans-serif;
+  --mono:        'Space Mono', monospace;
+  --sh-xs:       0 1px 3px rgba(7, 9, 69, 0.06);
+  --sh-sm:       0 2px 10px rgba(7, 9, 69, 0.07), 0 1px 3px rgba(7, 9, 69, 0.04);
+  --sh-md:       0 6px 24px rgba(7, 9, 69, 0.09), 0 2px 8px rgba(7, 9, 69, 0.05);
+  --sh-lg:       0 16px 48px rgba(7, 9, 69, 0.11), 0 4px 16px rgba(7, 9, 69, 0.06);
+  --sh-xl:       0 28px 72px rgba(7, 9, 69, 0.13), 0 8px 24px rgba(7, 9, 69, 0.07);
+}
+
+
+// ─── Shared section helpers ───────────────────────────────────────────────────
+
+.section {
+  padding: 68px 48px;
+
+  &--alt {
+    background: var(--off);
+    border-top:    1px solid var(--navy-border);
+    border-bottom: 1px solid var(--navy-border);
+  }
+
+  &__header {
+    margin-bottom: 44px;
+  }
+
+  &__kicker {
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--tan2);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    font-weight:    700;
+    margin-bottom:  10px;
+  }
+
+  &__h {
+    font-family:    var(--serif);
+    font-size:      clamp(28px, 4vw, 40px);
+    font-weight:    400;
+    color:          var(--navy);
+    letter-spacing: -.01em;
+    line-height:    1.1;
+    margin-bottom:  8px;
+  }
+
+  &__sub {
+    font-size:   14px;
+    color:       var(--muted);
+    line-height: 1.8;
+    font-weight: 300;
+    max-width:   480px;
+  }
+}
+
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+
+.svc-hero {
+  padding:         80px 48px 64px;
+  background:      var(--white);
+  border-bottom:   1px solid var(--navy-border);
+  position:        relative;
+  overflow:        hidden;
+
+  // subtle radial glow top-right
+  &::after {
+    content:    '';
+    position:   absolute;
+    width:      520px;
+    height:     520px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232, 204, 178, 0.18) 0%, transparent 70%);
+    top:   -160px;
+    right: -120px;
+    pointer-events: none;
+  }
+
+  &__inner {
+    position: relative;
+    z-index:  1;
+    max-width: 680px;
+  }
+
+  &__tag {
+    display:        inline-flex;
+    align-items:    center;
+    gap:            10px;
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--muted);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom:  28px;
+  }
+
+  &__dash {
+    display:    block;
+    width:      22px;
+    height:     1px;
+    background: var(--tan2);
+  }
+
+  &__h1 {
+    font-family:    var(--serif);
+    font-size:      clamp(38px, 6vw, 60px);
+    font-weight:    400;
+    line-height:    1.06;
+    color:          var(--navy);
+    margin-bottom:  22px;
+    letter-spacing: -.02em;
+
+    em {
+      font-style: italic;
+      color:      var(--tan2);
+    }
+  }
+
+  &__sub {
+    font-size:   15px;
+    color:       var(--muted);
+    line-height: 1.85;
+    font-weight: 300;
+    max-width:   500px;
+  }
+
+  &__scroll-cue {
+    margin-top: 48px;
+  }
+
+  &__scroll-line {
+    display:    block;
+    width:      1px;
+    height:     40px;
+    background: linear-gradient(to bottom, var(--tan2), transparent);
+    margin-left: 2px;
+    animation:  scroll-pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 1; transform: scaleY(1); }
+  50%       { opacity: .4; transform: scaleY(.6); }
+}
+
+
+// ─── Service Cards ────────────────────────────────────────────────────────────
+
+.svc-cards {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap:                   16px;
+}
+
+.svc-card {
+  background:    var(--white);
+  border:        1px solid var(--navy-border);
+  border-radius: 12px;
+  padding:       28px 24px;
+  box-shadow:    var(--sh-sm);
+  display:       flex;
+  flex-direction: column;
+  position:      relative;
+  overflow:      hidden;
+  transition:    box-shadow .18s, transform .18s;
+
+  &:hover {
+    box-shadow: var(--sh-md);
+    transform:  translateY(-2px);
+  }
+
+  &--featured {
+    border-color: var(--navy);
+    background:   var(--navy);
+    box-shadow:   var(--sh-lg);
+
+    .svc-card__num   { color: rgba(232, 204, 178, .25); }
+    .svc-card__title { color: var(--white); }
+    .svc-card__desc  { color: rgba(255, 255, 255, .55); }
+    .svc-card__item  { color: rgba(255, 255, 255, .70);
+      &::before { background: var(--tan2); }
+    }
+    .svc-card__price { color: var(--tan); }
+    .svc-card__cta {
+      color:        var(--navy);
+      background:   var(--tan);
+      border-color: transparent;
+    }
+  }
+
+  &__num {
+    font-family:    var(--serif);
+    font-size:      54px;
+    font-weight:    700;
+    color:          var(--navy-light);
+    line-height:    1;
+    position:       absolute;
+    top:            10px;
+    right:          14px;
+    pointer-events: none;
+    user-select:    none;
+  }
+
+  &__body {
+    flex:         1;
+    position:     relative;
+    z-index:      1;
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    font-family:   var(--serif);
+    font-size:     22px;
+    font-weight:   400;
+    color:         var(--navy);
+    margin-bottom: 10px;
+  }
+
+  &__desc {
+    font-size:     13px;
+    color:         var(--muted);
+    line-height:   1.75;
+    font-weight:   300;
+    margin-bottom: 18px;
+  }
+
+  &__list {
+    list-style:  none;
+    padding:     0;
+    margin:      0;
+    display:     flex;
+    flex-direction: column;
+    gap:         8px;
+  }
+
+  &__item {
+    font-size:      12px;
+    color:          var(--muted);
+    font-family:    var(--sans);
+    padding-left:   16px;
+    position:       relative;
+    line-height:    1.6;
+
+    &::before {
+      content:    '';
+      position:   absolute;
+      left:       0;
+      top:        7px;
+      width:      5px;
+      height:     5px;
+      border-radius: 50%;
+      background: var(--tan2);
+    }
+  }
+
+  &__footer {
+    border-top:  1px solid var(--navy-border);
+    padding-top: 18px;
+    display:     flex;
+    align-items: center;
+    justify-content: space-between;
+    gap:         10px;
+    flex-wrap:   wrap;
+  }
+
+  &__price {
+    font-family:    var(--mono);
+    font-size:      11px;
+    color:          var(--navy);
+    letter-spacing: .06em;
+    font-weight:    700;
+  }
+
+  &__cta {
+    font-family:    var(--sans);
+    font-size:      11px;
+    font-weight:    500;
+    color:          var(--navy);
+    text-decoration: none;
+    padding:        8px 16px;
+    border-radius:  4px;
+    border:         1.5px solid var(--navy-border);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    transition:     background .12s, border-color .12s;
+
+    &:hover {
+      background:   var(--navy-light);
+      border-color: var(--navy);
+    }
+  }
+}
+
+
+// ─── Packages ─────────────────────────────────────────────────────────────────
+
+.pkg-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap:                   16px;
+  align-items:           start;
+}
+
+.pkg-card {
+  background:    var(--white);
+  border:        1px solid var(--navy-border);
+  border-radius: 12px;
+  padding:       28px 24px;
+  position:      relative;
+  box-shadow:    var(--sh-sm);
+  transition:    box-shadow .18s;
+
+  &:hover { box-shadow: var(--sh-md); }
+
+  &--featured {
+    border-color: var(--navy);
+    box-shadow:   var(--sh-lg);
+    transform:    scale(1.02);
+    z-index:      1;
+  }
+
+  &__badge {
+    display:        inline-block;
+    font-family:    var(--mono);
+    font-size:      9px;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    color:          var(--navy);
+    background:     var(--tan3);
+    border:         1px solid var(--tan2);
+    border-radius:  3px;
+    padding:        4px 10px;
+    margin-bottom:  16px;
+  }
+
+  &__name {
+    font-family:    var(--mono);
+    font-size:      11px;
+    color:          var(--muted);
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    margin-bottom:  6px;
+  }
+
+  &__price {
+    font-family:    var(--serif);
+    font-size:      36px;
+    font-weight:    400;
+    color:          var(--navy);
+    line-height:    1;
+    margin-bottom:  10px;
+  }
+
+  &__desc {
+    font-size:     13px;
+    color:         var(--muted);
+    line-height:   1.7;
+    font-weight:   300;
+    margin-bottom: 20px;
+  }
+
+  &__features {
+    list-style:    none;
+    padding:       0;
+    margin:        0 0 24px;
+    border-top:    1px solid var(--navy-border);
+    padding-top:   18px;
+    display:       flex;
+    flex-direction: column;
+    gap:           10px;
+
+    li {
+      font-size:    12px;
+      color:        var(--muted);
+      padding-left: 20px;
+      position:     relative;
+      line-height:  1.6;
+
+      &::before {
+        content:    '✓';
+        position:   absolute;
+        left:       0;
+        color:      var(--tan2);
+        font-size:  10px;
+      }
+    }
+  }
+
+  &__btn {
+    display:        block;
+    width:          100%;
+    text-align:     center;
+    padding:        13px;
+    border-radius:  5px;
+    background:     var(--navy);
+    color:          var(--tan);
+    font-size:      11px;
+    font-family:    var(--sans);
+    font-weight:    500;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border:         none;
+    box-shadow:     0 3px 14px rgba(7, 9, 69, 0.22);
+    transition:     opacity .14s;
+
+    &:hover { opacity: .88; }
+  }
+}
+
+
+// ─── Add-ons ──────────────────────────────────────────────────────────────────
+
+.addon-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap:                   12px;
+}
+
+.addon-card {
+  background:    var(--white);
+  border:        1px solid var(--navy-border);
+  border-radius: 8px;
+  padding:       18px 20px;
+  box-shadow:    var(--sh-xs);
+  transition:    box-shadow .14s;
+
+  &:hover { box-shadow: var(--sh-sm); }
+
+  &__header {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     baseline;
+    margin-bottom:   8px;
+    gap:             10px;
+  }
+
+  &__title {
+    font-family: var(--serif);
+    font-size:   16px;
+    font-weight: 400;
+    color:       var(--navy);
+  }
+
+  &__price {
+    font-family:    var(--mono);
+    font-size:      11px;
+    color:          var(--tan2);
+    letter-spacing: .06em;
+    white-space:    nowrap;
+    font-weight:    700;
+  }
+
+  &__desc {
+    font-size:   12px;
+    color:       var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+}
+
+
+// ─── FAQ ──────────────────────────────────────────────────────────────────────
+
+.faq-list {
+  max-width: 720px;
+  display:   flex;
+  flex-direction: column;
+  gap:       0;
+  border:    1px solid var(--navy-border);
+  border-radius: 10px;
+  overflow:  hidden;
+  box-shadow: var(--sh-sm);
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--navy-border);
+  background:    var(--white);
+
+  &:last-child { border-bottom: none; }
+
+  &__q {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    width:           100%;
+    padding:         22px 24px;
+    background:      none;
+    border:          none;
+    cursor:          pointer;
+    font-family:     var(--sans);
+    font-size:       14px;
+    font-weight:     500;
+    color:           var(--navy);
+    text-align:      left;
+    gap:             16px;
+    transition:      background .12s;
+
+    &:hover { background: var(--navy-light); }
+
+    &[aria-expanded='true'] { background: var(--navy-light); }
+  }
+
+  &__icon {
+    font-family:    var(--mono);
+    font-size:      18px;
+    color:          var(--tan2);
+    flex-shrink:    0;
+    line-height:    1;
+    transition:     transform .18s;
+
+    .faq-item__q[aria-expanded='true'] & {
+      transform: rotate(45deg);
+    }
+  }
+
+  &__a {
+    padding:     0 24px 20px;
+    font-size:   14px;
+    color:       var(--muted);
+    line-height: 1.8;
+    font-weight: 300;
+
+    p { margin: 0; }
+  }
+}
+
+
+// ─── Full-width CTA Section ───────────────────────────────────────────────────
+
+.lc-cta-section {
+  background:    var(--navy);
+  padding:       76px 48px;
+  text-align:    center;
+  position:      relative;
+  overflow:      hidden;
+  border-top:    1px solid rgba(255, 255, 255, 0.06);
+
+  &::before {
+    content:        '';
+    position:       absolute;
+    width:          560px;
+    height:         560px;
+    border-radius:  50%;
+    background:     rgba(232, 204, 178, 0.05);
+    top:           -200px;
+    left:           50%;
+    transform:      translateX(-50%);
+    pointer-events: none;
+  }
+
+  &__kicker {
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          rgba(232, 204, 178, .5);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom:  14px;
+  }
+
+  &__h {
+    font-family:    var(--serif);
+    font-size:      clamp(32px, 5vw, 48px);
+    font-weight:    400;
+    color:          var(--white);
+    margin-bottom:  10px;
+    font-style:     italic;
+    line-height:    1.1;
+  }
+
+  &__sub {
+    font-size:     14px;
+    color:         rgba(255, 255, 255, .45);
+    margin-bottom: 12px;
+    line-height:   1.8;
+    font-weight:   300;
+  }
+
+  &__slots {
+    font-family:    var(--mono);
+    font-size:      11px;
+    color:          var(--tan2);
+    letter-spacing: .07em;
+    margin-bottom:  28px;
+  }
+
+  &__btn {
+    display:         inline-block;
+    background:      var(--tan);
+    color:           var(--navy);
+    font-size:       11px;
+    font-family:     var(--sans);
+    font-weight:     500;
+    padding:         15px 38px;
+    border-radius:   5px;
+    border:          none;
+    cursor:          pointer;
+    letter-spacing:  .08em;
+    text-transform:  uppercase;
+    box-shadow:      0 4px 20px rgba(232, 204, 178, 0.3);
+    text-decoration: none;
+    transition:      opacity .14s;
+
+    &:hover { opacity: .88; }
+  }
+}
+
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .section,
+  .svc-hero      { padding: 52px 24px; }
+  .lc-cta-section { padding: 52px 24px; }
+
+  .svc-cards,
+  .pkg-grid,
+  .addon-grid    { grid-template-columns: 1fr; }
+
+  .pkg-card--featured { transform: none; }
+}

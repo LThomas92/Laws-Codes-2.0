@@ -1,0 +1,107 @@
+// Contact page styles are in _project.scss
+// This file is reserved for future contact-specific overrides
+@use '../base/variables' as *;
+
+// ── GRAVITY FORMS — theme skin ─────────────────────────────
+// Map GF's markup onto the theme's existing form styles so the
+// GF form looks identical to the hand-rolled fallback form.
+
+.gform_wrapper {
+  // Reset GF's own layout container
+  .gform_body { width: 100%; }
+
+  // Field rows → our .form-group spacing
+  .gfield {
+    margin-bottom: 15px;
+
+    &.gfield--width-half {
+      display: inline-block;
+      width: calc(50% - 6px);
+      vertical-align: top;
+
+      &:nth-child(odd)  { margin-right: 12px; }
+
+      @media (max-width: 480px) {
+        width: 100%;
+        margin-right: 0;
+      }
+    }
+  }
+
+  // Labels → .form-label
+  .gfield_label {
+    font-family: $font-mono;
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: $muted;
+    display: block;
+    margin-bottom: 6px;
+    font-weight: $weight-normal;
+  }
+
+  // Required star — hide or soften
+  .gfield_required { color: $muted; font-size: 10px; }
+
+  // Inputs, selects, textareas → inherit .form-input styles
+  input:not([type=submit]):not([type=checkbox]):not([type=radio]),
+  select,
+  textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: $radius-md;
+    border: 1px solid $navy-border;
+    font-size: $text-base;
+    font-family: $font-sans;
+    color: $navy;
+    background: $white;
+    outline: none;
+    font-weight: $weight-light;
+    box-shadow: $shadow-xs;
+    transition: $transition-fast;
+    appearance: none;
+
+    &:focus { border-color: $navy; }
+    &::placeholder { color: $muted; }
+  }
+
+  textarea { resize: vertical; min-height: 90px; }
+
+  // Submit button → .form-submit / .btn-navy
+  .gform_footer,
+  .gform_page_footer {
+    padding: 0;
+    margin-top: 4px;
+
+    input[type=submit],
+    button[type=submit],
+    .gform_button {
+      @include navy-btn;
+      width: 100%;
+      text-align: center;
+      padding: 13px;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  // Validation errors
+  .gfield_error {
+    input:not([type=submit]),
+    select,
+    textarea { border-color: #c0392b; }
+  }
+
+  .validation_message {
+    color: #c0392b;
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  .gform_confirmation_message {
+    color: $navy;
+    font-family: $font-sans;
+    font-size: $text-base;
+    padding: 20px 0;
+  }
+}

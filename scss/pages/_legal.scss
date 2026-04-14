@@ -1,0 +1,126 @@
+// =============================================================================
+// LEGAL PAGES  —  _legal.scss
+// Shared by: page-privacy-policy.php, page-terms.php
+// Laws & Codes · lawscodes.com
+// =============================================================================
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+.legal-hero {
+  padding:       64px 48px 48px;
+  background:    var(--white);
+  border-bottom: 1px solid var(--navy-border);
+
+  &__inner { max-width: 720px; }
+
+  &__tag {
+    display:        inline-flex;
+    align-items:    center;
+    gap:            10px;
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--muted);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom:  18px;
+  }
+
+  &__dash {
+    display:    block;
+    width:      22px;
+    height:     1px;
+    background: var(--tan2);
+  }
+
+  &__h1 {
+    font-family:    var(--serif);
+    font-size:      clamp(28px, 4vw, 44px);
+    font-weight:    400;
+    color:          var(--navy);
+    letter-spacing: -.01em;
+    line-height:    1.1;
+    margin-bottom:  10px;
+  }
+
+  &__meta {
+    font-family:    var(--mono);
+    font-size:      11px;
+    color:          var(--muted);
+    letter-spacing: .06em;
+  }
+}
+
+
+// ─── Body ─────────────────────────────────────────────────────────────────────
+.legal-body {
+  background: var(--white);
+
+  &__inner {
+    max-width:     720px;
+    font-size:     14px;
+    color:         var(--muted);
+    line-height:   1.85;
+    font-weight:   300;
+    font-family:   var(--sans);
+
+    // Headings
+    h2 {
+      font-family:   var(--serif);
+      font-size:     22px;
+      font-weight:   400;
+      color:         var(--navy);
+      margin-top:    40px;
+      margin-bottom: 12px;
+      padding-top:   28px;
+      border-top:    1px solid var(--navy-border);
+
+      &:first-child { margin-top: 0; border-top: none; padding-top: 0; }
+    }
+
+    h3 {
+      font-family:   var(--serif);
+      font-size:     16px;
+      font-weight:   400;
+      color:         var(--navy);
+      margin-top:    24px;
+      margin-bottom: 10px;
+    }
+
+    // Paragraphs
+    p {
+      margin-bottom: 16px;
+    }
+
+    // Lists
+    ul, ol {
+      padding-left: 20px;
+      margin-bottom: 16px;
+
+      li {
+        margin-bottom: 8px;
+        line-height:   1.75;
+      }
+    }
+
+    // Links
+    a {
+      color:          var(--navy);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+
+      &:hover { color: var(--tan2); }
+    }
+
+    // Strong
+    strong {
+      font-weight: 500;
+      color:       var(--navy);
+    }
+  }
+}
+
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .legal-hero { padding: 48px 24px 36px; }
+  .legal-body .section { padding: 40px 24px; }
+}

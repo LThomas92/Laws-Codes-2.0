@@ -1,0 +1,51 @@
+// ============================================================
+// LAWS & CODES — HOME PAGE STYLES
+// ============================================================
+@use '../base/variables' as *;
+
+.home-hero { } // extends .hero from components
+
+// Project section
+.projects-section {
+  padding: $space-18 $container-pad;
+
+  .section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 0;
+  }
+
+  .view-all-btn {
+    @include mono-label;
+    color: $muted;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &:hover { color: $navy; }
+  }
+}
+
+// Process section
+.process-section {
+  padding: $space-16 $container-pad;
+  background: $off-white;
+  border-top: 1px solid $navy-border;
+  border-bottom: 1px solid $navy-border;
+
+  @include bp-md {
+    padding: $space-12 $container-pad-mobile;
+  }
+}
+
+// Testimonials section
+.testi-section {
+  padding: $space-18 $container-pad;
+  border-top: 1px solid $navy-border;
+
+  @include bp-md {
+    padding: $space-12 $container-pad-mobile;
+  }
+}

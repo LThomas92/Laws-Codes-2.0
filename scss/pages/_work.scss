@@ -1,0 +1,317 @@
+// =============================================================================
+// WORK PAGE  —  _work.scss
+// Laws & Codes · lawscodes.com
+// =============================================================================
+
+// (CSS vars assumed global — defined in _services.scss or :root in style.scss)
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+.work-hero {
+  padding:       80px 48px 64px;
+  background:    var(--white);
+  border-bottom: 1px solid var(--navy-border);
+  position:      relative;
+  overflow:      hidden;
+
+  &::after {
+    content:    '';
+    position:   absolute;
+    width:      480px;
+    height:     480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232, 204, 178, 0.15) 0%, transparent 70%);
+    top:  -140px;
+    right: -80px;
+    pointer-events: none;
+  }
+
+  &__inner { position: relative; z-index: 1; max-width: 640px; }
+
+  &__tag {
+    display:        inline-flex;
+    align-items:    center;
+    gap:            10px;
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--muted);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom:  28px;
+  }
+
+  &__dash {
+    display:    block;
+    width:      22px;
+    height:     1px;
+    background: var(--tan2);
+  }
+
+  &__h1 {
+    font-family:    var(--serif);
+    font-size:      clamp(36px, 5.5vw, 58px);
+    font-weight:    400;
+    line-height:    1.06;
+    color:          var(--navy);
+    letter-spacing: -.02em;
+    margin-bottom:  20px;
+
+    em { font-style: italic; color: var(--tan2); }
+  }
+
+  &__sub {
+    font-size:   15px;
+    color:       var(--muted);
+    line-height: 1.85;
+    font-weight: 300;
+    max-width:   480px;
+  }
+}
+
+
+// ─── Filters ──────────────────────────────────────────────────────────────────
+.work-filters {
+  background:    var(--off);
+  border-bottom: 1px solid var(--navy-border);
+  padding:       0 48px;
+  overflow-x:    auto;
+
+  &__inner {
+    display:     flex;
+    gap:         0;
+    white-space: nowrap;
+  }
+}
+
+.work-filter {
+  font-family:    var(--mono);
+  font-size:      10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding:        13px 18px;
+  border:         none;
+  background:     transparent;
+  color:          var(--muted);
+  cursor:         pointer;
+  border-bottom:  2px solid transparent;
+  transition:     color .12s, border-color .12s;
+
+  &:hover { color: var(--navy); }
+
+  &--active {
+    color:              var(--navy);
+    border-bottom-color: var(--navy);
+  }
+}
+
+
+// ─── Case Study Grid ──────────────────────────────────────────────────────────
+.cs-grid {
+  display:        flex;
+  flex-direction: column;
+  border:         1px solid var(--navy-border);
+  border-radius:  12px;
+  overflow:       hidden;
+  box-shadow:     var(--sh-sm);
+}
+
+.cs-item {
+  display:     grid;
+  grid-template-columns: 180px 1fr auto;
+  border-bottom: 1px solid var(--navy-border);
+  cursor:        pointer;
+  transition:    background .12s;
+  outline-offset: -2px;
+
+  &:last-child { border-bottom: none; }
+
+  &:hover { background: var(--navy-light); }
+  &:hover .cs-arr { color: var(--navy); }
+  &:focus-visible { outline: 2px solid var(--tan2); }
+}
+
+.cs-thumb {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-family:     var(--serif);
+  font-size:       12px;
+  color:           rgba(255, 255, 255, .4);
+  border-right:    1px solid var(--navy-border);
+  min-height:      110px;
+}
+
+.cs-body {
+  padding:        22px 26px;
+  display:        flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cs-tags {
+  display:       flex;
+  gap:           0;
+  margin-bottom: 7px;
+}
+
+.cs-tag {
+  font-family:    var(--mono);
+  font-size:      10px;
+  color:          var(--navy);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  opacity:        .5;
+
+  &::after {
+    content: '·';
+    margin:  0 8px;
+    opacity: .4;
+  }
+  &:last-child::after { display: none; }
+}
+
+.cs-title {
+  font-family:   var(--serif);
+  font-size:     21px;
+  font-weight:   400;
+  color:         var(--navy);
+  margin-bottom: 5px;
+}
+
+.cs-desc {
+  font-size:   13px;
+  color:       var(--muted);
+  line-height: 1.7;
+  font-weight: 300;
+  max-width:   440px;
+}
+
+.cs-meta {
+  padding:     22px 24px;
+  display:     flex;
+  align-items: center;
+  gap:         14px;
+  border-left: 1px solid var(--navy-border);
+}
+
+.cs-kpi-n {
+  font-family: var(--serif);
+  font-size:   26px;
+  color:       var(--navy);
+  font-weight: 400;
+  text-align:  right;
+}
+
+.cs-kpi-l {
+  font-family:    var(--mono);
+  font-size:      10px;
+  color:          var(--muted);
+  letter-spacing: .04em;
+  text-align:     right;
+}
+
+.cs-arr {
+  font-size:  16px;
+  color:      var(--light);
+  margin-left: 12px;
+  transition: color .12s;
+}
+
+.work-grid__empty {
+  font-size:   14px;
+  color:       var(--muted);
+  text-align:  center;
+  padding:     48px;
+}
+
+
+// ─── Testimonials ─────────────────────────────────────────────────────────────
+// (Shared .tgrid / .tc styles — also used in home page, defined once here)
+
+.tgrid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   16px;
+  margin-top:            36px;
+}
+
+.tc {
+  background:    var(--white);
+  border:        1px solid var(--navy-border);
+  border-radius: 10px;
+  padding:       26px 24px;
+  box-shadow:    var(--sh-sm);
+}
+
+.tc-stars {
+  display:       flex;
+  gap:           3px;
+  margin-bottom: 14px;
+}
+
+.star {
+  width:      11px;
+  height:     11px;
+  background: var(--tan2);
+  clip-path:  polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.tc-q {
+  font-family:   var(--serif);
+  font-size:     15px;
+  font-style:    italic;
+  color:         #333;
+  line-height:   1.85;
+  margin-bottom: 18px;
+  padding-left:  14px;
+  border-left:   2px solid var(--tan2);
+}
+
+.tc-person {
+  display:     flex;
+  align-items: center;
+  gap:         11px;
+}
+
+.tc-av {
+  width:           36px;
+  height:          36px;
+  border-radius:   50%;
+  background:      var(--navy);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-family:     var(--serif);
+  font-size:       12px;
+  font-weight:     600;
+  color:           var(--tan);
+  flex-shrink:     0;
+  box-shadow:      0 2px 8px rgba(7, 9, 69, 0.18);
+}
+
+.tc-name {
+  font-size:   13px;
+  font-weight: 500;
+  color:       var(--navy);
+}
+
+.tc-role {
+  font-size:      11px;
+  color:          var(--muted);
+  font-family:    var(--mono);
+  letter-spacing: .02em;
+}
+
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .work-hero           { padding: 52px 24px; }
+  .work-filters        { padding: 0 16px; }
+
+  .cs-item             { grid-template-columns: 60px 1fr auto; }
+  .cs-thumb            { min-height: 80px; font-size: 10px; }
+
+  .tgrid               { grid-template-columns: 1fr; }
+
+  .section             { padding: 52px 24px; }
+  .lc-cta-section      { padding: 52px 24px; }
+}

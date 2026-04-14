@@ -1,0 +1,325 @@
+// =============================================================================
+// PROCESS PAGE  —  _process.scss
+// Laws & Codes · lawscodes.com
+// =============================================================================
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+.proc-hero {
+  padding:       80px 48px 64px;
+  background:    var(--white);
+  border-bottom: 1px solid var(--navy-border);
+  position:      relative;
+  overflow:      hidden;
+
+  &::after {
+    content:    '';
+    position:   absolute;
+    inset:      0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 120px,
+      rgba(7, 9, 69, 0.02) 120px,
+      rgba(7, 9, 69, 0.02) 121px
+    );
+    pointer-events: none;
+  }
+
+  &__inner { position: relative; z-index: 1; max-width: 680px; }
+
+  &__tag {
+    display:        inline-flex;
+    align-items:    center;
+    gap:            10px;
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--muted);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom:  28px;
+  }
+
+  &__dash {
+    display:    block;
+    width:      22px;
+    height:     1px;
+    background: var(--tan2);
+  }
+
+  &__h1 {
+    font-family:    var(--serif);
+    font-size:      clamp(34px, 5.5vw, 58px);
+    font-weight:    400;
+    line-height:    1.06;
+    color:          var(--navy);
+    letter-spacing: -.02em;
+    margin-bottom:  22px;
+
+    em { font-style: italic; color: var(--tan2); }
+  }
+
+  &__sub {
+    font-size:   15px;
+    color:       var(--muted);
+    line-height: 1.85;
+    font-weight: 300;
+    max-width:   500px;
+  }
+}
+
+
+// ─── Phases List ──────────────────────────────────────────────────────────────
+.phases-list {
+  display:        flex;
+  flex-direction: column;
+  gap:            0;
+}
+
+.phase-item {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap:     0 32px;
+  padding-bottom: 0;
+
+  &--last .phase-item__card { padding-bottom: 0; }
+
+  &__aside {
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
+    padding-top:     4px;
+  }
+
+  &__num {
+    font-family:    var(--serif);
+    font-size:      13px;
+    font-weight:    700;
+    color:          var(--tan2);
+    letter-spacing: .08em;
+    width:          36px;
+    height:         36px;
+    border:         1.5px solid var(--tan2);
+    border-radius:  50%;
+    display:        flex;
+    align-items:    center;
+    justify-content: center;
+    background:     var(--white);
+    flex-shrink:    0;
+    position:       relative;
+    z-index:        1;
+  }
+
+  &__connector {
+    flex:       1;
+    width:      1px;
+    background: linear-gradient(to bottom, var(--tan2), var(--navy-border));
+    min-height: 48px;
+    margin-top: 0;
+  }
+
+  &__card {
+    background:    var(--white);
+    border:        1px solid var(--navy-border);
+    border-radius: 12px;
+    padding:       24px 28px;
+    margin-bottom: 24px;
+    box-shadow:    var(--sh-sm);
+    transition:    box-shadow .16s;
+
+    &:hover { box-shadow: var(--sh-md); }
+  }
+
+  &__header {
+    display:         flex;
+    align-items:     center;
+    justify-content: space-between;
+    gap:             16px;
+    margin-bottom:   12px;
+    flex-wrap:       wrap;
+  }
+
+  &__title {
+    font-family: var(--serif);
+    font-size:   24px;
+    font-weight: 400;
+    color:       var(--navy);
+  }
+
+  &__duration {
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--muted);
+    letter-spacing: .08em;
+    background:     var(--off);
+    border:         1px solid var(--navy-border);
+    padding:        4px 10px;
+    border-radius:  3px;
+  }
+
+  &__summary {
+    font-size:     14px;
+    color:         var(--muted);
+    line-height:   1.8;
+    font-weight:   300;
+    margin-bottom: 18px;
+  }
+
+  &__dl-label {
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--tan2);
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    font-weight:    700;
+    margin-bottom:  10px;
+  }
+
+  &__dl-list {
+    list-style:     none;
+    padding:        0;
+    margin:         0 0 18px;
+    display:        flex;
+    flex-direction: column;
+    gap:            7px;
+
+    li {
+      font-size:    13px;
+      color:        var(--muted);
+      font-weight:  300;
+      padding-left: 16px;
+      position:     relative;
+      line-height:  1.5;
+
+      &::before {
+        content:    '→';
+        position:   absolute;
+        left:       0;
+        color:      var(--tan2);
+        font-size:  10px;
+      }
+    }
+  }
+
+  &__tools {
+    display:   flex;
+    gap:       6px;
+    flex-wrap: wrap;
+  }
+
+  &__tool {
+    font-family:    var(--mono);
+    font-size:      10px;
+    padding:        4px 9px;
+    border-radius:  2px;
+    background:     var(--navy-light);
+    color:          var(--navy);
+    letter-spacing: .04em;
+  }
+}
+
+
+// ─── Expectations ─────────────────────────────────────────────────────────────
+.exp-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap:                   14px;
+  margin-top:            36px;
+}
+
+.exp-card {
+  background:    var(--white);
+  border:        1px solid var(--navy-border);
+  border-radius: 10px;
+  padding:       24px 20px;
+  box-shadow:    var(--sh-xs);
+
+  &__title {
+    font-family:   var(--serif);
+    font-size:     17px;
+    font-weight:   400;
+    color:         var(--navy);
+    margin-bottom: 10px;
+  }
+
+  &__body {
+    font-size:   13px;
+    color:       var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+}
+
+
+// ─── Timeline Callout ─────────────────────────────────────────────────────────
+.timeline-callout {
+  display:       grid;
+  grid-template-columns: 1fr 1fr;
+  gap:           48px;
+  align-items:   center;
+  background:    var(--white);
+  border:        1px solid var(--navy-border);
+  border-radius: 14px;
+  padding:       48px;
+  box-shadow:    var(--sh-md);
+
+  &__left { border-right: 1px solid var(--navy-border); padding-right: 48px; }
+
+  &__duration {
+    font-family:    var(--serif);
+    font-size:      56px;
+    font-weight:    400;
+    color:          var(--navy);
+    line-height:    1;
+    margin-top:     10px;
+    margin-bottom:  6px;
+  }
+
+  &__label {
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--muted);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  &__intro {
+    font-size:     14px;
+    color:         var(--muted);
+    line-height:   1.85;
+    font-weight:   300;
+    margin-bottom: 24px;
+  }
+}
+
+// ─── Shared button ───────────────────────────────────────────────────────────
+.btn-navy {
+  display:         inline-block;
+  background:      var(--navy);
+  color:           var(--tan);
+  font-size:       11px;
+  font-family:     var(--sans);
+  font-weight:     500;
+  padding:         13px 28px;
+  border-radius:   5px;
+  border:          none;
+  cursor:          pointer;
+  letter-spacing:  .07em;
+  text-transform:  uppercase;
+  box-shadow:      0 3px 14px rgba(7, 9, 69, 0.22);
+  text-decoration: none;
+  transition:      opacity .14s;
+
+  &:hover { opacity: .88; }
+}
+
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .proc-hero            { padding: 52px 24px; }
+  .section              { padding: 52px 24px; }
+  .lc-cta-section       { padding: 52px 24px; }
+
+  .phase-item           { grid-template-columns: 48px 1fr; gap: 0 16px; }
+  .timeline-callout     { grid-template-columns: 1fr; padding: 28px; }
+  .timeline-callout__left { border-right: none; border-bottom: 1px solid var(--navy-border); padding-right: 0; padding-bottom: 24px; }
+}

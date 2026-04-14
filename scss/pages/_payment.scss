@@ -1,0 +1,375 @@
+// =============================================================================
+// PAYMENT PAGE  —  _payment.scss
+// Laws & Codes · lawscodes.com
+// =============================================================================
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+.payment-hero {
+  padding:       64px 48px 52px;
+  background:    var(--navy);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position:      relative;
+  overflow:      hidden;
+
+  &::before {
+    content:        '';
+    position:       absolute;
+    width:          560px;
+    height:         560px;
+    border-radius:  50%;
+    background:     rgba(232, 204, 178, 0.05);
+    top:           -220px;
+    right:         -100px;
+    pointer-events: none;
+  }
+
+  &__inner { position: relative; z-index: 1; max-width: 680px; }
+
+  &__tag {
+    display:        inline-flex;
+    align-items:    center;
+    gap:            10px;
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          rgba(255, 255, 255, .4);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom:  20px;
+  }
+
+  &__dash {
+    display:    block;
+    width:      22px;
+    height:     1px;
+    background: var(--tan2);
+  }
+
+  &__h1 {
+    font-family:    var(--serif);
+    font-size:      clamp(28px, 4vw, 44px);
+    font-weight:    400;
+    color:          var(--white);
+    letter-spacing: -.01em;
+    line-height:    1.1;
+    margin-bottom:  12px;
+  }
+
+  &__amount {
+    font-family:    var(--serif);
+    font-size:      clamp(36px, 6vw, 60px);
+    font-weight:    400;
+    color:          var(--tan);
+    line-height:    1;
+    margin-bottom:  10px;
+  }
+
+  &__desc {
+    font-size:   14px;
+    color:       rgba(255, 255, 255, .5);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+}
+
+
+// ─── Body Grid ────────────────────────────────────────────────────────────────
+.payment-body {
+  background: var(--off);
+
+  &__grid {
+    display:     grid;
+    grid-template-columns: 380px 1fr;
+    gap:         48px;
+    align-items: start;
+  }
+}
+
+
+// ─── Summary Panel ────────────────────────────────────────────────────────────
+.payment-summary {
+  position:      sticky;
+  top:           24px;
+  background:    var(--white);
+  border:        1px solid var(--navy-border);
+  border-radius: 12px;
+  padding:       28px 24px;
+  box-shadow:    var(--sh-sm);
+
+  &__label {
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--tan2);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-weight:    700;
+    margin-bottom:  18px;
+  }
+
+  &__rows {
+    border:        1px solid var(--navy-border);
+    border-radius: 8px;
+    overflow:      hidden;
+    margin-bottom: 20px;
+  }
+
+  &__row {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     baseline;
+    gap:             12px;
+    padding:         12px 14px;
+    border-bottom:   1px solid var(--navy-border);
+    font-size:       13px;
+    color:           var(--muted);
+
+    &:last-child { border-bottom: none; }
+
+    span:last-child {
+      font-weight: 500;
+      color:       var(--navy);
+      text-align:  right;
+    }
+
+    &--total {
+      background: var(--navy-light);
+
+      span:first-child {
+        font-family:    var(--mono);
+        font-size:      10px;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+      span:last-child {
+        font-family: var(--serif);
+        font-size:   22px;
+        color:       var(--navy);
+        font-weight: 400;
+      }
+    }
+  }
+
+  &__trust {
+    display:        flex;
+    flex-direction: column;
+    gap:            10px;
+    padding:        16px 0;
+    border-top:     1px solid var(--navy-border);
+    border-bottom:  1px solid var(--navy-border);
+    margin-bottom:  16px;
+  }
+
+  &__terms {
+    font-size:   12px;
+    color:       var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+}
+
+.payment-trust-item {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  font-size:   12px;
+  color:       var(--muted);
+  font-weight: 300;
+
+  &__icon {
+    width:      16px;
+    height:     16px;
+    color:      var(--tan2);
+    flex-shrink: 0;
+  }
+}
+
+
+// ─── Form Panel ───────────────────────────────────────────────────────────────
+.payment-form-wrap {
+  background:    var(--white);
+  border:        1px solid var(--navy-border);
+  border-radius: 12px;
+  padding:       32px 28px;
+  box-shadow:    var(--sh-sm);
+
+  &__label {
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--tan2);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-weight:    700;
+    margin-bottom:  22px;
+  }
+}
+
+.payment-field {
+  margin-bottom: 18px;
+
+  &__label {
+    display:        block;
+    font-size:      12px;
+    color:          var(--muted);
+    margin-bottom:  6px;
+    letter-spacing: .02em;
+    font-family:    var(--sans);
+  }
+
+  &__input {
+    width:         100%;
+    padding:       12px 14px;
+    border:        1px solid var(--navy-border);
+    border-radius: 5px;
+    font-size:     14px;
+    font-family:   var(--sans);
+    color:         var(--navy);
+    background:    var(--white);
+    outline:       none;
+    transition:    border-color .14s, box-shadow .14s;
+
+    &::placeholder { color: var(--muted); }
+
+    &:focus {
+      border-color: var(--navy);
+      box-shadow:   0 0 0 3px rgba(7, 9, 69, 0.08);
+    }
+  }
+}
+
+// Stripe Elements container
+#payment-element {
+  margin-bottom: 20px;
+}
+
+
+// ─── Error ────────────────────────────────────────────────────────────────────
+.payment-error {
+  background:    rgba(223, 27, 65, 0.06);
+  border:        1px solid rgba(223, 27, 65, 0.2);
+  border-radius: 6px;
+  padding:       12px 16px;
+  font-size:     13px;
+  color:         #df1b41;
+  margin-bottom: 16px;
+  line-height:   1.6;
+}
+
+
+// ─── Submit Button ────────────────────────────────────────────────────────────
+.payment-submit {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             10px;
+  width:           100%;
+  padding:         15px;
+  background:      var(--navy);
+  color:           var(--tan);
+  font-size:       12px;
+  font-family:     var(--sans);
+  font-weight:     500;
+  letter-spacing:  .08em;
+  text-transform:  uppercase;
+  border:          none;
+  border-radius:   5px;
+  cursor:          pointer;
+  box-shadow:      0 3px 14px rgba(7, 9, 69, 0.22);
+  transition:      opacity .14s;
+  margin-bottom:   16px;
+
+  &:disabled {
+    opacity: .5;
+    cursor:  not-allowed;
+  }
+}
+
+
+// ─── Spinner ──────────────────────────────────────────────────────────────────
+.payment-spinner svg {
+  width:     18px;
+  height:    18px;
+  animation: lc-spin 0.7s linear infinite;
+}
+
+@keyframes lc-spin {
+  to { transform: rotate(360deg); }
+}
+
+
+// ─── Success ──────────────────────────────────────────────────────────────────
+.payment-success {
+  text-align:  center;
+  padding:     40px 0 20px;
+
+  &__icon {
+    width:           52px;
+    height:          52px;
+    border-radius:   50%;
+    background:      rgba(39, 201, 63, 0.1);
+    border:          2px solid rgba(39, 201, 63, 0.4);
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    font-size:       22px;
+    color:           #27c93f;
+    margin:          0 auto 18px;
+  }
+
+  h3 {
+    font-family:   var(--serif);
+    font-size:     22px;
+    font-weight:   400;
+    color:         var(--navy);
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size:     13px;
+    color:         var(--muted);
+    line-height:   1.7;
+    font-weight:   300;
+    margin-bottom: 20px;
+  }
+
+  &__home {
+    font-family:    var(--mono);
+    font-size:      11px;
+    color:          var(--navy);
+    letter-spacing: .08em;
+    text-decoration: none;
+
+    &:hover { color: var(--tan2); }
+  }
+}
+
+
+// ─── Stripe Badge ─────────────────────────────────────────────────────────────
+.payment-stripe-badge {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  justify-content: center;
+  padding-top: 6px;
+
+  svg  { height: 20px; width: auto; }
+  span {
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--muted);
+    letter-spacing: .06em;
+  }
+}
+
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 860px) {
+  .payment-body__grid {
+    grid-template-columns: 1fr;
+  }
+  .payment-summary { position: static; }
+}
+
+@media (max-width: 768px) {
+  .payment-hero       { padding: 48px 24px 40px; }
+  .payment-body.section { padding: 36px 24px; }
+  .payment-form-wrap  { padding: 24px 18px; }
+}
