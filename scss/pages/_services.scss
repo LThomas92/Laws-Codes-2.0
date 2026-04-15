@@ -4,9 +4,6 @@
 // Import this in your main style.scss:  @use 'pages/services';
 // =============================================================================
 
-@use '../abstracts/variables' as *;   // exposes $navy, $tan, etc.
-@use '../abstracts/mixins'    as *;   // exposes respond-to(), fluid-type(), etc.
-
 // ─── CSS Custom Props (mirrors root vars) ────────────────────────────────────
 // If you don't use a variables partial, define them here:
 :root {
@@ -545,6 +542,7 @@
     color:       var(--muted);
     line-height: 1.8;
     font-weight: 300;
+    padding-top: 1rem;
 
     p { margin: 0; }
   }

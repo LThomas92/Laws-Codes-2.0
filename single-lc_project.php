@@ -9,27 +9,27 @@ get_header();
 while ( have_posts() ) :
   the_post();
   $id         = get_the_ID();
-  $client     = get_post_meta( $id, '_lc_client_name',  true );
-  $industry   = get_post_meta( $id, '_lc_industry',     true );
-  $location   = get_post_meta( $id, '_lc_location',     true );
-  $year       = get_post_meta( $id, '_lc_year',         true );
-  $timeline   = get_post_meta( $id, '_lc_timeline',     true );
-  $services   = get_post_meta( $id, '_lc_services',     true );
-  $tech_raw   = get_post_meta( $id, '_lc_tech_stack',   true );
+  $client     = get_post_meta( $id, 'cs_client_name',  true );
+  $industry   = get_post_meta( $id, 'cs_industry',     true );
+  $location   = get_post_meta( $id, 'cs_location',     true );
+  $year       = get_post_meta( $id, 'cs_year',         true );
+  $timeline   = get_post_meta( $id, 'cs_timeline',     true );
+  $services   = get_post_meta( $id, 'cs_services',     true );
+  $tech_raw   = get_post_meta( $id, 'cs_tech_stack',   true );
   $tech_arr   = $tech_raw ? array_map( 'trim', explode( ',', $tech_raw ) ) : [];
   $kpis       = [
-    [ get_post_meta( $id, '_lc_kpi_1_num', true ), get_post_meta( $id, '_lc_kpi_1_label', true ) ],
-    [ get_post_meta( $id, '_lc_kpi_2_num', true ), get_post_meta( $id, '_lc_kpi_2_label', true ) ],
-    [ get_post_meta( $id, '_lc_kpi_3_num', true ), get_post_meta( $id, '_lc_kpi_3_label', true ) ],
-    [ get_post_meta( $id, '_lc_kpi_4_num', true ), get_post_meta( $id, '_lc_kpi_4_label', true ) ],
+    [ get_post_meta( $id, 'cs_kpi_1_num', true ), get_post_meta( $id, 'cs_kpi_1_label', true ) ],
+    [ get_post_meta( $id, 'cs_kpi_2_num', true ), get_post_meta( $id, 'cs_kpi_2_label', true ) ],
+    [ get_post_meta( $id, 'cs_kpi_3_num', true ), get_post_meta( $id, 'cs_kpi_3_label', true ) ],
+    [ get_post_meta( $id, 'cs_kpi_4_num', true ), get_post_meta( $id, 'cs_kpi_4_label', true ) ],
   ];
-  $github     = get_post_meta( $id, '_lc_github_url',   true );
-  $live       = get_post_meta( $id, '_lc_live_url',     true );
-  $challenge  = get_post_meta( $id, '_lc_challenge',    true );
-  $solution   = get_post_meta( $id, '_lc_solution',     true );
-  $results    = get_post_meta( $id, '_lc_results',      true );
-  $bg         = get_post_meta( $id, '_lc_bg_color',     true ) ?: '#0e0c2e';
-  $cat_label  = get_post_meta( $id, '_lc_category_label', true );
+  $github     = get_post_meta( $id, 'cs_github_url',   true );
+  $live       = get_post_meta( $id, 'cs_live_url',     true );
+  $challenge  = get_post_meta( $id, 'cs_challenge',    true );
+  $solution   = get_post_meta( $id, 'cs_solution',     true );
+  $results    = get_post_meta( $id, 'cs_results',      true );
+  $bg         = get_post_meta( $id, 'cs_bg_color',     true ) ?: '#0e0c2e';
+  $cat_label  = get_post_meta( $id, 'cs_category_label', true );
 ?>
 
 <!-- ── PROJECT HERO ─────────────────────────────────── -->
@@ -117,15 +117,6 @@ while ( have_posts() ) :
     <?php if ( $solution ) : ?>
       <h2 class="project-section-title">What we built</h2>
       <div class="project-text"><?php echo wp_kses_post( $solution ); ?></div>
-    <?php endif; ?>
-
-    <?php if ( $tech_arr ) : ?>
-      <h2 class="project-section-title">Tech stack</h2>
-      <div class="stack-pills">
-        <?php foreach ( $tech_arr as $t ) : ?>
-          <span class="stack-pill"><?php echo esc_html( $t ); ?></span>
-        <?php endforeach; ?>
-      </div>
     <?php endif; ?>
 
     <?php if ( $results ) : ?>

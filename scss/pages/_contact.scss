@@ -6,6 +6,10 @@
 // Map GF's markup onto the theme's existing form styles so the
 // GF form looks identical to the hand-rolled fallback form.
 
+  .gform_title {
+    display: none !important;
+  }
+
 .gform_wrapper {
   // Reset GF's own layout container
   .gform_body { width: 100%; }

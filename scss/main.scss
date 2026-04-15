@@ -8,6 +8,14 @@
 @use 'layout/layout';
 @use 'components/components';
 @use 'components/header';
+@use 'components/nav';
 @use 'pages/home';
 @use 'pages/project';
 @use 'pages/contact';
+@use 'pages/case-study';
+@use 'pages/about';
+@use 'pages/legal';
+@use 'pages/payment';
+@use 'pages/process';
+@use 'pages/services';
+@use 'pages/work';

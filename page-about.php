@@ -62,22 +62,6 @@ get_header(); ?>
   </section>
 
   <?php
-  // ── STATS ─────────────────────────────────────────────────────────────────
-  $stats = get_field('about_stats');
-  if ( $stats ) : ?>
-
-  <div class="about-stats">
-    <?php foreach ( $stats as $stat ) : ?>
-    <div class="about-stat">
-      <div class="about-stat__n"><?php echo esc_html( $stat['stat_number'] ); ?></div>
-      <div class="about-stat__l"><?php echo esc_html( $stat['stat_label'] ); ?></div>
-    </div>
-    <?php endforeach; ?>
-  </div>
-
-  <?php endif; ?>
-
-  <?php
   // ── FOUNDER ───────────────────────────────────────────────────────────────
   $founder = get_field('founder');
   if ( $founder ) :

@@ -486,3 +486,137 @@ add_filter( 'document_title_separator', 'lc_document_title_separator' );
 // ── EXCERPT LENGTH ────────────────────────────────────────
 add_filter( 'excerpt_length', fn() => 28 );
 add_filter( 'excerpt_more',   fn() => '...' );
+
+//SAVE LOCAL JSON
+
+add_filter( 'acf/settings/save_json', function () {
+    return get_stylesheet_directory() . '/acf-json';
+} );
+
+add_filter( 'acf/settings/load_json', function ( $paths ) {
+    $paths[] = get_stylesheet_directory() . '/acf-json';
+    return $paths;
+} );
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 4. STRIPE — WP_AJAX handlers registration
+//    (The actual functions live in stripe/page-payment.php which is loaded
+//     when the template is rendered. To use them globally, you can move the
+//     function definitions here and remove them from the template.)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Uncomment if you move lc_create_payment_intent() here:
+// add_action( 'wp_ajax_nopriv_lc_create_payment_intent', 'lc_create_payment_intent' );
+// add_action( 'wp_ajax_lc_create_payment_intent',        'lc_create_payment_intent' );
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 5. STRIPE WEBHOOK ENDPOINT
+//    Add this early (before headers send) so the webhook fires on any request.
+//    Alternatively handle via a custom REST route (see below).
+// ══════════════════════════════════════════════════════════════════════════════
+add_action( 'init', function () {
+    if ( isset( $_GET['stripe_webhook'] ) && $_GET['stripe_webhook'] === '1' ) {
+        if ( function_exists( 'lc_handle_stripe_webhook' ) ) {
+            lc_handle_stripe_webhook();
+            exit;
+        }
+    }
+} );
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 6. ALTERNATIVE: Stripe webhook as WP REST API endpoint
+//    URL: https://yourdomain.com/wp-json/lawscodes/v1/stripe-webhook
+//    (Use this URL in Stripe Dashboard instead of ?stripe_webhook=1)
+// ══════════════════════════════════════════════════════════════════════════════
+add_action( 'rest_api_init', function () {
+
+    register_rest_route( 'lawscodes/v1', '/stripe-webhook', [
+        'methods'             => 'POST',
+        'callback'            => 'lc_rest_stripe_webhook',
+        'permission_callback' => '__return_true',
+    ] );
+
+} );
+
+function lc_rest_stripe_webhook( WP_REST_Request $request ) {
+    if ( ! defined( 'STRIPE_SECRET_KEY' ) ) {
+        return new WP_REST_Response( [ 'error' => 'Not configured' ], 400 );
+    }
+
+    $theme_dir = get_template_directory();
+    if ( file_exists( $theme_dir . '/vendor/autoload.php' ) ) {
+        require_once $theme_dir . '/vendor/autoload.php';
+    }
+
+    \Stripe\Stripe::setApiKey( STRIPE_SECRET_KEY );
+
+    $payload = $request->get_body();
+    $sig     = $request->get_header( 'stripe-signature' );
+
+    try {
+        $event = \Stripe\Webhook::constructEvent( $payload, $sig, STRIPE_WEBHOOK_SECRET );
+    } catch ( \Exception $e ) {
+        return new WP_REST_Response( [ 'error' => $e->getMessage() ], 400 );
+    }
+
+    switch ( $event->type ) {
+        case 'payment_intent.succeeded':
+            $intent = $event->data->object;
+            lc_notify_payment_received( $intent );
+            break;
+        case 'payment_intent.payment_failed':
+            // Log or email client about failed payment
+            break;
+    }
+
+    return new WP_REST_Response( [ 'received' => true ], 200 );
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 7. HELPER: Generate a payment link programmatically
+//    Use this in admin or via a custom dashboard to send invoice links.
+// ══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Generate a Stripe payment page URL.
+ *
+ * @param string $invoice_id  e.g. 'INV-2024-001'
+ * @param int    $amount_usd  Amount in dollars (will be converted to cents)
+ * @param string $description e.g. '50% Deposit — Project Name'
+ * @return string
+ */
+function lc_payment_url( string $invoice_id, int $amount_usd, string $description = '' ): string {
+    $page = get_page_by_path( 'payment' );
+    if ( ! $page ) return home_url('/payment/');
+
+    return add_query_arg( [
+        'invoice' => rawurlencode( $invoice_id ),
+        'amount'  => $amount_usd * 100,
+        'desc'    => rawurlencode( $description ?: "Invoice {$invoice_id}" ),
+    ], get_permalink( $page ) );
+}
+
+// Example usage:
+// $link = lc_payment_url( 'INV-2024-042', 1200, '50% Deposit — Brow Beast Redesign' );
+// Then email it to the client.
+
+
+//Project Image
+add_image_size( 'lc-project-hero', 800, 380, true ); // true = hard crop
+
+require_once get_template_directory() . '/inc/search-ajax.php';
+
+// Enqueue the JS
+add_action('wp_enqueue_scripts', function() {
+  wp_enqueue_script(
+    'lawscodes-search',
+    get_template_directory_uri() . '/src/modules/search.js',
+    ['lawscodes-main'], // depends on your main script handle
+    null,
+    true
+  );
+});

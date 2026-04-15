@@ -3,3 +3,4 @@
  */
 import './modules/main.js';
 import './modules/quiz.js';
+import './modules/search.js';
