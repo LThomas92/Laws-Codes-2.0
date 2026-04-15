@@ -18,155 +18,145 @@
   top:             0;
   z-index:         200;
   gap:             24px;
+}
 
-  &__brand {
-    display:         flex;
-    align-items:     center;
-    gap:             10px;
-    text-decoration: none;
-    flex-shrink:     0;
-  }
+.site-nav__brand {
+  display:         flex;
+  align-items:     center;
+  gap:             10px;
+  text-decoration: none;
+  flex-shrink:     0;
+}
 
-  &__logo-mark {
-    width:           34px;
-    height:          34px;
-    background:      var(--navy);
-    border-radius:   7px;
-    display:         flex;
-    align-items:     center;
-    justify-content: center;
-    box-shadow:      0 2px 10px rgba(7, 9, 69, 0.25);
-    flex-shrink:     0;
-  }
+.site-nav__logo-mark {
+  width:           34px;
+  height:          34px;
+  background:      var(--navy);
+  border-radius:   7px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  box-shadow:      0 2px 10px rgba(7, 9, 69, 0.25);
+  flex-shrink:     0;
+}
 
-  &__brand-name {
-    display:     flex;
-    align-items: center;
+.site-nav__brand-name {
+  display:     flex;
+  align-items: center;
 
-    img {
-      height:  22px;
-      width:   auto;
-      display: block;
-    }
-  }
-
-  // Desktop nav links — centred, hidden on mobile
-  &__links {
-    display:         flex;
-    align-items:     center;
-    gap:             36px;
-    flex:            1;
-    justify-content: center;
-
-    a {
-      font-size:       12px;
-      font-weight:     400;
-      color:           var(--muted);
-      text-decoration: none;
-      letter-spacing:  .04em;
-      text-transform:  uppercase;
-      font-family:     var(--mono);
-      transition:      color .14s;
-      white-space:     nowrap;
-
-      &:hover,
-      &[aria-current="page"] { color: var(--navy); }
-    }
-  }
-
-  // Right cluster: slots badge + CTA + search + hamburger
-  &__right {
-    display:     flex;
-    align-items: center;
-    gap:         10px;
-    flex-shrink: 0;
-
-    // The global search overlay is rendered inside here in the DOM
-    // but it's position:fixed so it doesn't affect layout —
-    // we just need to make sure this container doesn't clip it
-    overflow:    visible;
-    position:    static;
-  }
-
-  &__slots {
-    font-family:    var(--mono);
-    font-size:      10px;
-    color:          var(--navy);
-    letter-spacing: .07em;
-    background:     var(--navy-light);
-    padding:        5px 12px;
-    border-radius:  3px;
-    border:         1px solid var(--navy-border);
-    white-space:    nowrap;
-  }
-
-  &__cta {
-    background:      var(--navy);
-    color:           var(--tan);
-    font-size:       11px;
-    font-family:     var(--sans);
-    font-weight:     500;
-    padding:         10px 22px;
-    border-radius:   5px;
-    border:          none;
-    cursor:          pointer;
-    letter-spacing:  .06em;
-    text-transform:  uppercase;
-    box-shadow:      0 2px 12px rgba(7, 9, 69, 0.2);
-    text-decoration: none;
-    white-space:     nowrap;
-    transition:      opacity .14s;
-
-    &:hover { opacity: .88; }
-  }
-
-  // Hamburger — hidden on desktop, shown on mobile
-  &__hamburger {
-    display:         none;
-    flex-direction:  column;
-    justify-content: center;
-    align-items:     center;
-    gap:             5px;
-    width:           36px;
-    height:          36px;
-    background:      none;
-    border:          1px solid var(--navy-border);
-    border-radius:   6px;
-    cursor:          pointer;
-    padding:         0;
-    flex-shrink:     0;
-    transition:      background .12s, border-color .12s;
-
-    &:hover {
-      background:   var(--navy-light);
-      border-color: var(--navy);
-    }
-  }
-
-  &__bar {
-    display:          block;
-    width:            16px;
-    height:           1.5px;
-    background:       var(--navy);
-    border-radius:    2px;
-    transition:       transform .22s ease, opacity .22s ease, width .22s ease;
-    transform-origin: center;
-  }
-
-  // Animated X when menu is open
-  &__hamburger.is-active {
-    background:   var(--navy-light);
-    border-color: var(--navy);
-
-    .site-nav__bar:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-    .site-nav__bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .site-nav__bar:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+  img {
+    height:  45px;
+    width:   auto;
+    display: block;
   }
 }
 
-// Prevent scroll when mobile menu or search overlay is open
-body.menu-open   { overflow: hidden; }
-body.search-open { overflow: hidden; }
+.site-nav__links {
+  display:         flex;
+  align-items:     center;
+  gap:             36px;
+  flex:            1;
+  justify-content: center;
+
+  a {
+    font-size:       12px;
+    font-weight:     400;
+    color:           var(--muted);
+    text-decoration: none;
+    letter-spacing:  .04em;
+    text-transform:  uppercase;
+    font-family:     var(--mono);
+    transition:      color .14s;
+    white-space:     nowrap;
+  }
+
+  a:hover,
+  a[aria-current="page"] { color: var(--navy); }
+}
+
+.site-nav__right {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  flex-shrink: 0;
+}
+
+.site-nav__slots {
+  font-family:    var(--mono);
+  font-size:      10px;
+  color:          var(--navy);
+  letter-spacing: .07em;
+  background:     var(--navy-light);
+  padding:        5px 12px;
+  border-radius:  3px;
+  border:         1px solid var(--navy-border);
+  white-space:    nowrap;
+}
+
+.site-nav__cta {
+  display:         inline-flex;
+  align-items:     center;
+  height:          34px;
+  padding:         0 20px;
+  background:      var(--navy);
+  color:           var(--tan);
+  font-size:       11px;
+  font-family:     var(--sans);
+  font-weight:     500;
+  border-radius:   5px;
+  border:          none;
+  cursor:          pointer;
+  letter-spacing:  .06em;
+  text-transform:  uppercase;
+  box-shadow:      0 2px 12px rgba(7, 9, 69, 0.2);
+  text-decoration: none;
+  white-space:     nowrap;
+  transition:      opacity .14s;
+}
+
+.site-nav__cta:hover { opacity: .88; }
+
+// Hamburger
+.site-nav__hamburger {
+  display:         none;
+  flex-direction:  column;
+  justify-content: center;
+  align-items:     center;
+  gap:             5px;
+  width:           36px;
+  height:          36px;
+  background:      none;
+  border:          1px solid var(--navy-border);
+  border-radius:   6px;
+  cursor:          pointer;
+  padding:         0;
+  flex-shrink:     0;
+  transition:      background .12s, border-color .12s;
+}
+
+.site-nav__hamburger:hover {
+  background:   var(--navy-light);
+  border-color: var(--navy);
+}
+
+.site-nav__bar {
+  display:          block;
+  width:            16px;
+  height:           1.5px;
+  background:       var(--navy);
+  border-radius:    2px;
+  transition:       transform .22s ease, opacity .22s ease;
+  transform-origin: center;
+}
+
+// Active (X) state — flat rules, no nested BEM compound selectors
+.site-nav__hamburger.is-active                    { background: var(--navy-light); border-color: var(--navy); }
+.site-nav__hamburger.is-active .site-nav__bar:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.site-nav__hamburger.is-active .site-nav__bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.site-nav__hamburger.is-active .site-nav__bar:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+// Scroll lock
+body.menu-open { overflow: hidden; }
 
 
 // ─── Mobile Menu ──────────────────────────────────────────────────────────────
@@ -178,186 +168,172 @@ body.search-open { overflow: hidden; }
   display:        flex;
   pointer-events: none;
   visibility:     hidden;
-
-  &__inner {
-    position:        relative;
-    z-index:         2;
-    width:           min(320px, 85vw);
-    height:          100%;
-    background:      var(--white);
-    border-right:    1px solid var(--navy-border);
-    display:         flex;
-    flex-direction:  column;
-    box-shadow:      var(--sh-xl);
-    transform:       translateX(-100%);
-    transition:      transform .28s cubic-bezier(.4, 0, .2, 1);
-    overflow-y:      auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  &__backdrop {
-    position:        absolute;
-    inset:           0;
-    z-index:         1;
-    background:      rgba(7, 9, 69, 0.45);
-    opacity:         0;
-    transition:      opacity .28s ease;
-    backdrop-filter: blur(2px);
-  }
-
-  &.is-open {
-    pointer-events: all;
-    visibility:     visible;
-
-    .mobile-menu__inner    { transform: translateX(0); }
-    .mobile-menu__backdrop { opacity: 1; }
-  }
-
-  // Top bar: brand + close button
-  &__top {
-    display:         flex;
-    align-items:     center;
-    justify-content: space-between;
-    padding:         20px 24px;
-    border-bottom:   1px solid var(--navy-border);
-    flex-shrink:     0;
-  }
-
-  &__brand {
-    font-family:     var(--serif);
-    font-size:       17px;
-    font-weight:     500;
-    color:           var(--navy);
-    text-decoration: none;
-  }
-
-  &__close {
-    display:         flex;
-    align-items:     center;
-    justify-content: center;
-    width:           32px;
-    height:          32px;
-    background:      none;
-    border:          1px solid var(--navy-border);
-    border-radius:   6px;
-    cursor:          pointer;
-    color:           var(--navy);
-    transition:      background .12s;
-
-    &:hover { background: var(--navy-light); }
-  }
-
-  // Nav links list
-  &__nav {
-    flex:           1;
-    padding:        8px 0;
-    display:        flex;
-    flex-direction: column;
-  }
-
-  &__link {
-    display:         flex;
-    align-items:     center;
-    justify-content: space-between;
-    padding:         16px 24px;
-    font-family:     var(--serif);
-    font-size:       22px;
-    font-weight:     400;
-    color:           var(--navy);
-    text-decoration: none;
-    border-bottom:   1px solid var(--navy-border);
-    transition:      background .12s, padding-left .14s;
-
-    &:last-child { border-bottom: none; }
-
-    &:hover {
-      background:   var(--navy-light);
-      padding-left: 30px;
-    }
-
-    &[aria-current="page"] {
-      background: var(--navy-light);
-      color:      var(--tan2);
-    }
-  }
-
-  // ── Arrow fix: use sibling/descendant selectors, NOT Sass parent ref ──
-  // The Sass `&` nesting trick doesn't always work for this pattern.
-  // Declare it as a flat rule instead.
-  &__arrow {
-    font-size:       14px;
-    color:           var(--tan2);
-    opacity:         0;
-    transform:       translateX(-8px);
-    transition:      opacity .14s ease, transform .14s ease;
-    flex-shrink:     0;
-    line-height:     1;
-  }
 }
 
-// Arrow visibility — flat selector outside the BEM block (avoids nesting issue)
-.mobile-menu__link:hover       .mobile-menu__arrow,
-.mobile-menu__link:focus-visible .mobile-menu__arrow,
-.mobile-menu__link[aria-current="page"] .mobile-menu__arrow {
-  opacity:   1;
-  transform: translateX(0);
+.mobile-menu__inner {
+  position:        relative;
+  z-index:         2;
+  width:           min(320px, 85vw);
+  height:          100%;
+  background:      var(--white);
+  border-right:    1px solid var(--navy-border);
+  display:         flex;
+  flex-direction:  column;
+  box-shadow:      var(--sh-xl);
+  transform:       translateX(-100%);
+  transition:      transform .28s cubic-bezier(.4, 0, .2, 1);
+  overflow-y:      auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.mobile-menu__link[aria-current="page"] .mobile-menu__arrow {
-  opacity: 0.5; // subtler on active page
+.mobile-menu__backdrop {
+  position:        absolute;
+  inset:           0;
+  z-index:         1;
+  background:      rgba(7, 9, 69, 0.45);
+  opacity:         0;
+  transition:      opacity .28s ease;
+  backdrop-filter: blur(2px);
 }
 
-
-// Mobile menu footer
-.mobile-menu {
-  &__footer {
-    padding:        24px;
-    border-top:     1px solid var(--navy-border);
-    display:        flex;
-    flex-direction: column;
-    gap:            12px;
-    flex-shrink:    0;
-  }
-
-  &__cta {
-    display:         block;
-    text-align:      center;
-    background:      var(--navy);
-    color:           var(--tan);
-    font-size:       11px;
-    font-family:     var(--sans);
-    font-weight:     500;
-    padding:         14px;
-    border-radius:   5px;
-    text-decoration: none;
-    letter-spacing:  .07em;
-    text-transform:  uppercase;
-    box-shadow:      0 3px 14px rgba(7, 9, 69, 0.22);
-    transition:      opacity .14s;
-
-    &:hover { opacity: .88; }
-  }
-
-  &__slots {
-    font-family:    var(--mono);
-    font-size:      10px;
-    color:          var(--tan2);
-    letter-spacing: .07em;
-    text-align:     center;
-  }
-
-  &__email {
-    font-family:     var(--mono);
-    font-size:       11px;
-    color:           var(--muted);
-    text-align:      center;
-    text-decoration: none;
-    letter-spacing:  .04em;
-    transition:      color .12s;
-
-    &:hover { color: var(--navy); }
-  }
+.mobile-menu.is-open {
+  pointer-events: all;
+  visibility:     visible;
 }
+
+.mobile-menu.is-open .mobile-menu__inner    { transform: translateX(0); }
+.mobile-menu.is-open .mobile-menu__backdrop { opacity: 1; }
+
+.mobile-menu__top {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         20px 24px;
+  border-bottom:   1px solid var(--navy-border);
+  flex-shrink:     0;
+}
+
+.mobile-menu__brand {
+  font-family:     var(--serif);
+  font-size:       17px;
+  font-weight:     500;
+  color:           var(--navy);
+  text-decoration: none;
+}
+
+.mobile-menu__close {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           32px;
+  height:          32px;
+  background:      none;
+  border:          1px solid var(--navy-border);
+  border-radius:   6px;
+  cursor:          pointer;
+  color:           var(--navy);
+  transition:      background .12s;
+}
+
+.mobile-menu__close:hover { background: var(--navy-light); }
+
+.mobile-menu__nav {
+  flex:           1;
+  padding:        8px 0;
+  display:        flex;
+  flex-direction: column;
+}
+
+.mobile-menu__link {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         16px 24px;
+  font-family:     var(--serif);
+  font-size:       22px;
+  font-weight:     400;
+  color:           var(--navy);
+  text-decoration: none;
+  border-bottom:   1px solid var(--navy-border);
+  transition:      background .12s, padding-left .14s;
+}
+
+.mobile-menu__link:last-child { border-bottom: none; }
+
+.mobile-menu__link:hover {
+  background:   var(--navy-light);
+  padding-left: 30px;
+}
+
+.mobile-menu__link[aria-current="page"] {
+  background: var(--navy-light);
+  color:      var(--tan2);
+}
+
+// Arrow — hidden by default, revealed on hover/active
+.mobile-menu__arrow {
+  font-size:        14px;
+  color:            var(--tan2);
+  opacity:          0;
+  transform:        translateX(-8px);
+  transition:       opacity .14s ease, transform .14s ease;
+  flex-shrink:      0;
+  line-height:      1;
+  pointer-events:   none;
+}
+
+// Flat descendant selectors — most reliable cross-compiler approach
+.mobile-menu__link:hover .mobile-menu__arrow        { opacity: 1; transform: translateX(0); }
+.mobile-menu__link:focus-visible .mobile-menu__arrow { opacity: 1; transform: translateX(0); }
+.mobile-menu__link[aria-current="page"] .mobile-menu__arrow { opacity: .45; transform: translateX(0); }
+
+.mobile-menu__footer {
+  padding:        24px;
+  border-top:     1px solid var(--navy-border);
+  display:        flex;
+  flex-direction: column;
+  gap:            12px;
+  flex-shrink:    0;
+}
+
+.mobile-menu__cta {
+  display:         block;
+  text-align:      center;
+  background:      var(--navy);
+  color:           var(--tan);
+  font-size:       11px;
+  font-family:     var(--sans);
+  font-weight:     500;
+  padding:         14px;
+  border-radius:   5px;
+  text-decoration: none;
+  letter-spacing:  .07em;
+  text-transform:  uppercase;
+  box-shadow:      0 3px 14px rgba(7, 9, 69, 0.22);
+  transition:      opacity .14s;
+}
+
+.mobile-menu__cta:hover { opacity: .88; }
+
+.mobile-menu__slots {
+  font-family:    var(--mono);
+  font-size:      10px;
+  color:          var(--tan2);
+  letter-spacing: .07em;
+  text-align:     center;
+}
+
+.mobile-menu__email {
+  font-family:     var(--mono);
+  font-size:       11px;
+  color:           var(--muted);
+  text-align:      center;
+  text-decoration: none;
+  letter-spacing:  .04em;
+  transition:      color .12s;
+}
+
+.mobile-menu__email:hover { color: var(--navy); }
 
 
 // ─── Responsive ───────────────────────────────────────────────────────────────
@@ -368,22 +344,14 @@ body.search-open { overflow: hidden; }
 }
 
 @media (max-width: 768px) {
-  .site-nav {
-    padding: 0 20px;
-    height:  60px;
-  }
-
-  .site-nav__links { display: none; }
-  .site-nav__slots { display: none; }
-  .site-nav__cta   { display: none; }
-
+  .site-nav            { padding: 0 20px; height: 60px; }
+  .site-nav__links     { display: none; }
+  .site-nav__slots     { display: none; }
+  .site-nav__cta       { display: none; }
   .site-nav__hamburger { display: flex; }
-
-  // Keep search trigger visible but icon-only on mobile
-  .global-search-trigger__label { display: none; }
 }
 
 @media (max-width: 380px) {
-  .site-nav { padding: 0 14px; }
-  .site-nav__brand-name img { height: 18px; }
+  .site-nav                  { padding: 0 14px; }
+  .site-nav__brand-name img  { height: 18px; }
 }

@@ -30,48 +30,39 @@ function lc_setup() {
 
     // Image sizes
     add_image_size( 'lc-project-thumb',  600,  400, true );
-    add_image_size( 'lc-project-hero',  1200,  700, true );
+    add_image_size( 'lc-project-hero',   800,  380, true );
     add_image_size( 'lc-project-card',   400,  280, true );
 
     // Nav menus
     register_nav_menus([
-        'primary' => __( 'Primary Menu',    'laws-codes' ),
-        'footer'  => __( 'Footer Menu',     'laws-codes' ),
-        'social'  => __( 'Social Menu',     'laws-codes' ),
+        'primary' => __( 'Primary Menu', 'laws-codes' ),
+        'footer'  => __( 'Footer Menu',  'laws-codes' ),
+        'social'  => __( 'Social Menu',  'laws-codes' ),
     ]);
 }
 add_action( 'after_setup_theme', 'lc_setup' );
 
 // ── ASSET MANIFEST HELPER ─────────────────────────────────
-/**
- * Reads dist/assets.json (written by assets-webpack-plugin) to get
- * content-hashed filenames in production. Falls back to plain names
- * when the manifest is absent (first install / dev mode).
- */
 function lc_asset( string $key, string $type ): string {
     static $manifest = null;
 
     if ( $manifest === null ) {
-        $path = LC_DIR . '/dist/assets.json';
+        $path     = LC_DIR . '/dist/assets.json';
         $manifest = file_exists( $path )
             ? (array) json_decode( file_get_contents( $path ), true )
             : [];
     }
 
-    // assets.json stores paths like "js/main-abc123.js"
     $file = $manifest[ $key ][ $type ] ?? null;
     if ( $file ) {
         return LC_URI . '/dist/' . ltrim( $file, '/' );
     }
 
-    // Sensible fallback matching webpack output names
-    $ext = $type === 'js' ? 'js/main.js' : 'css/style.css';
-    return LC_URI . '/dist/' . $ext;
+    return LC_URI . '/dist/' . ( $type === 'js' ? 'js/main.js' : 'css/style.css' );
 }
 
 // ── SCRIPTS & STYLES ──────────────────────────────────────
 function lc_enqueue() {
-    // Google Fonts
     wp_enqueue_style(
         'lc-google-fonts',
         'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap',
@@ -79,7 +70,6 @@ function lc_enqueue() {
         null
     );
 
-    // Compiled CSS — webpack outputs dist/css/style.css (MiniCssExtractPlugin)
     wp_enqueue_style(
         'lc-main',
         lc_asset( 'main', 'css' ),
@@ -87,159 +77,136 @@ function lc_enqueue() {
         LC_VERSION
     );
 
-    // Main JS bundle — src/index.js imports all modules
     wp_enqueue_script(
         'lc-main',
         lc_asset( 'main', 'js' ),
         [],
         LC_VERSION,
-        true   // load in footer
+        true
     );
 
-    // Localize shared data (must come after enqueue)
     wp_localize_script( 'lc-main', 'LC_Data', [
-        'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
-        'nonce'     => wp_create_nonce( 'lc_nonce' ),
-        'siteUrl'   => get_site_url(),
-        'restUrl'   => rest_url( 'lawscodes/v1/' ),
+        'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+        'nonce'   => wp_create_nonce( 'lc_nonce' ),
+        'siteUrl' => get_site_url(),
+        'restUrl' => rest_url( 'lawscodes/v1/' ),
     ]);
 
-    // Pass featured project data to the switcher (front page only)
     if ( is_front_page() ) {
         wp_localize_script( 'lc-main', 'LC_Projects', lc_get_featured_projects() );
     }
+
+    wp_enqueue_script(
+        'lawscodes-search',
+        LC_URI . '/src/modules/search.js',
+        [ 'lc-main' ],
+        LC_VERSION,
+        true
+    );
 }
 add_action( 'wp_enqueue_scripts', 'lc_enqueue' );
 
-// ── GRAVITY FORMS INTEGRATION ─────────────────────────────
-/**
- * Move Gravity Forms scripts to the footer to avoid render-blocking.
- * Add the filter only when GF is active.
- */
+// ── GRAVITY FORMS ─────────────────────────────────────────
 if ( class_exists( 'GFForms' ) ) {
     add_filter( 'gform_init_scripts_footer', '__return_true' );
 
-    /**
-     * Apply theme CSS classes to GF form fields so they inherit
-     * the theme's form-input / form-label / form-submit styles.
-     */
     add_filter( 'gform_field_css_class', function( $classes, $field, $form ) {
         $classes .= ' lc-gf-field';
         return $classes;
     }, 10, 3 );
 
-    /**
-     * Wrap the GF submit button in the theme's button class.
-     */
     add_filter( 'gform_submit_button', function( $button, $form ) {
         return str_replace( 'class=\'gform_button', 'class=\'form-submit gform_button', $button );
     }, 10, 2 );
 }
 
-// ── ACF — LOCAL JSON SYNC ──────────────────────────────────
-/**
- * Tell ACF to save / load field groups from the theme's acf-json folder.
- * This keeps field group definitions in version control.
- */
-if ( function_exists( 'acf_add_local_field_group' ) || defined( 'ACF_VERSION' ) ) {
-    add_filter( 'acf/settings/save_json', function() {
-        return LC_DIR . '/acf-json';
-    });
+// ── ACF LOCAL JSON SYNC ───────────────────────────────────
+add_filter( 'acf/settings/save_json', function () {
+    return get_stylesheet_directory() . '/acf-json';
+} );
 
-    add_filter( 'acf/settings/load_json', function( $paths ) {
-        $paths[] = LC_DIR . '/acf-json';
-        return $paths;
-    });
-}
+add_filter( 'acf/settings/load_json', function ( $paths ) {
+    $paths[] = get_stylesheet_directory() . '/acf-json';
+    return $paths;
+} );
 
-// ── ACF → PROJECT META BRIDGE ──────────────────────────────
-/**
- * When ACF is active, lc_get_featured_projects() reads ACF fields
- * via get_field() for a cleaner API. When ACF is absent it falls back
- * to raw get_post_meta() (existing behaviour — no change needed there).
- *
- * ACF field names mirror the _lc_* meta keys defined below but without
- * the leading underscore, e.g. "lc_client_name", "lc_bg_color", etc.
- * Set these up in ACF > Field Groups > Project Details.
- */
+// ── ACF → PROJECT META BRIDGE ─────────────────────────────
 function lc_project_field( int $post_id, string $key ): string {
-    $acf_key = ltrim( $key, '_' ); // "_lc_bg_color" → "lc_bg_color"
+    $acf_key = ltrim( $key, '_' );
     if ( function_exists( 'get_field' ) ) {
         return (string) get_field( $acf_key, $post_id );
     }
     return (string) get_post_meta( $post_id, $key, true );
 }
 
-// ── CUSTOM POST TYPE: PROJECTS ─────────────────────────────
+// ── CPT: lc_project ───────────────────────────────────────
 function lc_register_project_cpt() {
     register_post_type( 'lc_project', [
-        'labels'      => [
-            'name'               => __( 'Projects',           'laws-codes' ),
-            'singular_name'      => __( 'Project',            'laws-codes' ),
-            'add_new_item'       => __( 'Add New Project',    'laws-codes' ),
-            'edit_item'          => __( 'Edit Project',       'laws-codes' ),
-            'new_item'           => __( 'New Project',        'laws-codes' ),
-            'view_item'          => __( 'View Project',       'laws-codes' ),
-            'search_items'       => __( 'Search Projects',    'laws-codes' ),
-            'not_found'          => __( 'No projects found.', 'laws-codes' ),
-            'menu_name'          => __( 'Projects',           'laws-codes' ),
+        'labels' => [
+            'name'          => __( 'Projects',           'laws-codes' ),
+            'singular_name' => __( 'Project',            'laws-codes' ),
+            'add_new_item'  => __( 'Add New Project',    'laws-codes' ),
+            'edit_item'     => __( 'Edit Project',       'laws-codes' ),
+            'new_item'      => __( 'New Project',        'laws-codes' ),
+            'view_item'     => __( 'View Project',       'laws-codes' ),
+            'search_items'  => __( 'Search Projects',    'laws-codes' ),
+            'not_found'     => __( 'No projects found.', 'laws-codes' ),
+            'menu_name'     => __( 'Projects',           'laws-codes' ),
         ],
-        'public'            => true,
-        'show_in_rest'      => true,
-        'has_archive'       => true,
-        'menu_icon'         => 'dashicons-portfolio',
-        'menu_position'     => 5,
-        'supports'          => [ 'title', 'editor', 'thumbnail', 'excerpt', 'custom-fields' ],
-        'rewrite'           => [ 'slug' => 'work' ],
-        'show_in_graphql'   => false,
+        'public'        => true,
+        'show_in_rest'  => true,
+        'has_archive'   => false,
+        'menu_icon'     => 'dashicons-portfolio',
+        'menu_position' => 5,
+        'supports'      => [ 'title', 'editor', 'thumbnail', 'excerpt', 'custom-fields' ],
+        'rewrite'       => [ 'slug' => 'lc-project', 'with_front' => false ],
     ]);
 }
-add_action( 'init', 'lc_register_project_cpt' );
+add_action( 'init', 'lc_register_project_cpt', 0 );
 
-// ── CUSTOM TAXONOMY: PROJECT CATEGORY ─────────────────────
+// ── CPT: lc_case_study ────────────────────────────────────
+function lc_register_case_study_cpt() {
+    register_post_type( 'lc_case_study', [
+        'labels' => [
+            'name'          => __( 'Case Studies',       'laws-codes' ),
+            'singular_name' => __( 'Case Study',         'laws-codes' ),
+            'add_new_item'  => __( 'Add New Case Study', 'laws-codes' ),
+            'edit_item'     => __( 'Edit Case Study',    'laws-codes' ),
+        ],
+        'public'        => true,
+        'show_in_rest'  => true,
+        'has_archive'   => false,
+        'menu_icon'     => 'dashicons-portfolio',
+        'menu_position' => 6,
+        'supports'      => [ 'title', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields' ],
+        'rewrite'       => [ 'slug' => 'case-study', 'with_front' => false ],
+    ]);
+}
+add_action( 'init', 'lc_register_case_study_cpt', 0 );
+
+// ── Flush rewrites on theme switch ────────────────────────
+add_action( 'after_switch_theme', function () {
+    lc_register_project_cpt();
+    lc_register_case_study_cpt();
+    flush_rewrite_rules();
+} );
+
+// ── TAXONOMY: Project Category ────────────────────────────
 function lc_register_project_tax() {
     register_taxonomy( 'lc_project_cat', 'lc_project', [
-        'labels'        => [
+        'labels' => [
             'name'          => __( 'Project Categories', 'laws-codes' ),
             'singular_name' => __( 'Project Category',  'laws-codes' ),
         ],
-        'public'        => true,
-        'hierarchical'  => true,
-        'show_in_rest'  => true,
-        'rewrite'       => [ 'slug' => 'work-category' ],
+        'public'       => true,
+        'hierarchical' => true,
+        'show_in_rest' => true,
+        'rewrite'      => [ 'slug' => 'work-category' ],
     ]);
 }
 add_action( 'init', 'lc_register_project_tax' );
 
-// ── CUSTOM FIELDS FOR PROJECTS (via post meta) ─────────────
-/**
- * Meta fields used per project:
- *  _lc_client_name     — Client business name
- *  _lc_industry        — e.g. Beauty & Wellness
- *  _lc_location        — e.g. New York, NY
- *  _lc_year            — e.g. 2024
- *  _lc_timeline        — e.g. 6 weeks
- *  _lc_services        — comma-separated: Design, Dev, Brand
- *  _lc_tech_stack      — comma-separated: WordPress, WooCommerce...
- *  _lc_kpi_1_num       — e.g. 3×
- *  _lc_kpi_1_label     — e.g. Booking increase
- *  _lc_kpi_2_num       — e.g. 6wk
- *  _lc_kpi_2_label     — e.g. Delivery
- *  _lc_kpi_3_num       — e.g. 12
- *  _lc_kpi_3_label     — e.g. Products launched
- *  _lc_kpi_4_num       — e.g. 100%
- *  _lc_kpi_4_label     — e.g. Mobile optimized
- *  _lc_github_url      — GitHub repo URL
- *  _lc_live_url        — Live site URL
- *  _lc_featured        — 1 if shown in homepage switcher
- *  _lc_switcher_order  — int, order in switcher
- *  _lc_bg_color        — hex for project card bg, e.g. #0e0c2e
- *  _lc_category_label  — e.g. Beauty · E-Commerce
- *  _lc_result_teaser   — one-liner for case study list
- *  _lc_challenge       — challenge paragraph (HTML)
- *  _lc_solution        — solution paragraph (HTML)
- *  _lc_results         — results paragraph (HTML)
- */
+// ── PROJECT META FIELDS ───────────────────────────────────
 function lc_register_project_meta() {
     $text_fields = [
         '_lc_client_name', '_lc_industry', '_lc_location', '_lc_year',
@@ -280,13 +247,10 @@ function lc_get_featured_projects(): array {
     $query = new WP_Query([
         'post_type'      => 'lc_project',
         'posts_per_page' => 6,
-        'meta_query'     => [[
-            'key'   => '_lc_featured',
-            'value' => '1',
-        ]],
-        'meta_key'  => '_lc_switcher_order',
-        'orderby'   => 'meta_value_num',
-        'order'     => 'ASC',
+        'meta_query'     => [[ 'key' => '_lc_featured', 'value' => '1' ]],
+        'meta_key'       => '_lc_switcher_order',
+        'orderby'        => 'meta_value_num',
+        'order'          => 'ASC',
     ]);
 
     $projects = [];
@@ -297,22 +261,19 @@ function lc_get_featured_projects(): array {
             $id = get_the_ID();
 
             $projects[] = [
-                'id'             => $id,
-                'title'          => get_the_title(),
-                'slug'           => get_post_field( 'post_name', $id ),
-                'url'            => get_permalink( $id ),
-                'industry'       => lc_project_field( $id, '_lc_industry' ),
-                'categoryLabel'  => lc_project_field( $id, '_lc_category_label' ),
-                'bgColor'        => lc_project_field( $id, '_lc_bg_color' ) ?: '#0e0c2e',
-                'kpi1Num'        => lc_project_field( $id, '_lc_kpi_1_num' ),
-                'kpi1Label'      => lc_project_field( $id, '_lc_kpi_1_label' ),
-                'kpi2Num'        => lc_project_field( $id, '_lc_kpi_2_num' ),
-                'kpi2Label'      => lc_project_field( $id, '_lc_kpi_2_label' ),
-                'techStack'      => array_map(
-                    'trim',
-                    explode( ',', lc_project_field( $id, '_lc_tech_stack' ) )
-                ),
-                'thumbnail'      => get_the_post_thumbnail_url( $id, 'lc-project-card' ),
+                'id'            => $id,
+                'title'         => get_the_title(),
+                'slug'          => get_post_field( 'post_name', $id ),
+                'url'           => get_permalink( $id ),
+                'industry'      => lc_project_field( $id, '_lc_industry' ),
+                'categoryLabel' => lc_project_field( $id, '_lc_category_label' ),
+                'bgColor'       => lc_project_field( $id, '_lc_bg_color' ) ?: '#0e0c2e',
+                'kpi1Num'       => lc_project_field( $id, '_lc_kpi_1_num' ),
+                'kpi1Label'     => lc_project_field( $id, '_lc_kpi_1_label' ),
+                'kpi2Num'       => lc_project_field( $id, '_lc_kpi_2_num' ),
+                'kpi2Label'     => lc_project_field( $id, '_lc_kpi_2_label' ),
+                'techStack'     => array_map( 'trim', explode( ',', lc_project_field( $id, '_lc_tech_stack' ) ) ),
+                'thumbnail'     => get_the_post_thumbnail_url( $id, 'lc-project-card' ),
             ];
         }
         wp_reset_postdata();
@@ -321,10 +282,10 @@ function lc_get_featured_projects(): array {
     return $projects;
 }
 
-// ── CUSTOM TESTIMONIALS POST TYPE ─────────────────────────
+// ── CPT: lc_testimonial ───────────────────────────────────
 function lc_register_testimonial_cpt() {
     register_post_type( 'lc_testimonial', [
-        'labels'        => [
+        'labels' => [
             'name'          => __( 'Testimonials',        'laws-codes' ),
             'singular_name' => __( 'Testimonial',         'laws-codes' ),
             'add_new_item'  => __( 'Add New Testimonial', 'laws-codes' ),
@@ -333,24 +294,15 @@ function lc_register_testimonial_cpt() {
         'show_ui'       => true,
         'show_in_rest'  => true,
         'menu_icon'     => 'dashicons-format-quote',
-        'menu_position' => 6,
+        'menu_position' => 7,
         'supports'      => [ 'title', 'editor', 'custom-fields' ],
     ]);
 
-    // Meta: client name, role, company, star rating, project link
-    $testi_meta = [
-        '_lc_testi_client'  => 'string',
-        '_lc_testi_role'    => 'string',
-        '_lc_testi_company' => 'string',
-        '_lc_testi_initials'=> 'string',
-        '_lc_testi_project' => 'string',
-    ];
-
-    foreach ( $testi_meta as $key => $type ) {
+    foreach ( [ '_lc_testi_client', '_lc_testi_role', '_lc_testi_company', '_lc_testi_initials', '_lc_testi_project' ] as $key ) {
         register_post_meta( 'lc_testimonial', $key, [
             'show_in_rest'  => true,
             'single'        => true,
-            'type'          => $type,
+            'type'          => 'string',
             'auth_callback' => fn() => current_user_can( 'edit_posts' ),
         ]);
     }
@@ -364,17 +316,17 @@ function lc_register_testimonial_cpt() {
 }
 add_action( 'init', 'lc_register_testimonial_cpt' );
 
-// ── CONTACT FORM AJAX HANDLER ──────────────────────────────
+// ── CONTACT FORM AJAX ─────────────────────────────────────
 function lc_handle_contact_form() {
     check_ajax_referer( 'lc_nonce', 'nonce' );
 
     $fields = [
-        'first_name' => sanitize_text_field( $_POST['first_name'] ?? '' ),
-        'last_name'  => sanitize_text_field( $_POST['last_name']  ?? '' ),
-        'email'      => sanitize_email(      $_POST['email']      ?? '' ),
-        'business'   => sanitize_text_field( $_POST['business']   ?? '' ),
-        'service'    => sanitize_text_field( $_POST['service']    ?? '' ),
-        'message'    => sanitize_textarea_field( $_POST['message'] ?? '' ),
+        'first_name' => sanitize_text_field(     $_POST['first_name'] ?? '' ),
+        'last_name'  => sanitize_text_field(     $_POST['last_name']  ?? '' ),
+        'email'      => sanitize_email(          $_POST['email']      ?? '' ),
+        'business'   => sanitize_text_field(     $_POST['business']   ?? '' ),
+        'service'    => sanitize_text_field(     $_POST['service']    ?? '' ),
+        'message'    => sanitize_textarea_field( $_POST['message']    ?? '' ),
     ];
 
     if ( empty( $fields['email'] ) || ! is_email( $fields['email'] ) ) {
@@ -385,18 +337,18 @@ function lc_handle_contact_form() {
         wp_send_json_error( [ 'message' => 'Please fill in all required fields.' ] );
     }
 
-    $to      = get_option( 'admin_email' );
-    $subject = sprintf( 'New project enquiry from %s %s', $fields['first_name'], $fields['last_name'] );
-    $body    = lc_build_contact_email( $fields );
-    $headers = [
-        'Content-Type: text/html; charset=UTF-8',
-        sprintf( 'Reply-To: %s <%s>', $fields['first_name'] . ' ' . $fields['last_name'], $fields['email'] ),
-    ];
-
-    $sent = wp_mail( $to, $subject, $body, $headers );
+    $sent = wp_mail(
+        get_option( 'admin_email' ),
+        sprintf( 'New enquiry from %s %s', $fields['first_name'], $fields['last_name'] ),
+        lc_build_contact_email( $fields ),
+        [
+            'Content-Type: text/html; charset=UTF-8',
+            sprintf( 'Reply-To: %s <%s>', trim( $fields['first_name'] . ' ' . $fields['last_name'] ), $fields['email'] ),
+        ]
+    );
 
     if ( $sent ) {
-        wp_send_json_success( [ 'message' => 'Message sent. We\'ll be in touch within one business day.' ] );
+        wp_send_json_success( [ 'message' => "Message sent. We'll be in touch within one business day." ] );
     } else {
         wp_send_json_error( [ 'message' => 'Something went wrong — please email hello@lawscodes.com directly.' ] );
     }
@@ -422,15 +374,14 @@ function lc_build_contact_email( array $f ): string {
     );
 }
 
-// ── QUIZ SUBMISSION AJAX ───────────────────────────────────
+// ── QUIZ LEAD AJAX ────────────────────────────────────────
 function lc_handle_quiz_lead() {
     check_ajax_referer( 'lc_nonce', 'nonce' );
 
     $result  = sanitize_text_field( $_POST['result']  ?? '' );
     $answers = array_map( 'sanitize_text_field', (array) ( $_POST['answers'] ?? [] ) );
 
-    // Store as a simple post for lead tracking
-    $post_id = wp_insert_post([
+    wp_insert_post([
         'post_type'   => 'lc_quiz_lead',
         'post_title'  => sprintf( 'Quiz lead — %s — %s', $result, current_time( 'mysql' ) ),
         'post_status' => 'private',
@@ -446,76 +397,74 @@ function lc_handle_quiz_lead() {
 add_action( 'wp_ajax_nopriv_lc_quiz_lead', 'lc_handle_quiz_lead' );
 add_action( 'wp_ajax_lc_quiz_lead',        'lc_handle_quiz_lead' );
 
-// ── WIDGET AREAS ──────────────────────────────────────────
-function lc_widgets_init() {
-    register_sidebar([
-        'name'          => __( 'Footer Widget Area', 'laws-codes' ),
-        'id'            => 'footer-1',
-        'description'   => __( 'Widgets in the footer.', 'laws-codes' ),
-        'before_widget' => '<div id="%1$s" class="widget %2$s">',
-        'after_widget'  => '</div>',
-        'before_title'  => '<h3 class="widget-title">',
-        'after_title'   => '</h3>',
-    ]);
+// ── GLOBAL SEARCH AJAX ────────────────────────────────────
+require_once LC_DIR . '/inc/search-ajax.php';
+
+// ── STRIPE: Payment Intent (moved here from page-payment.php) ─────────────────
+// Must live in functions.php so the AJAX handler is registered on every
+// request — not just when the payment page template loads.
+add_action( 'wp_ajax_nopriv_lc_create_payment_intent', 'lc_create_payment_intent' );
+add_action( 'wp_ajax_lc_create_payment_intent',        'lc_create_payment_intent' );
+
+function lc_create_payment_intent() {
+    check_ajax_referer( 'lc_stripe_nonce', 'nonce' );
+
+    if ( ! defined( 'STRIPE_SECRET_KEY' ) ) {
+        wp_send_json_error( 'Stripe is not configured — STRIPE_SECRET_KEY missing from wp-config.php.' );
+    }
+
+    $autoload = get_template_directory() . '/vendor/autoload.php';
+    if ( ! file_exists( $autoload ) ) {
+        wp_send_json_error( 'Stripe PHP library not found. Run: composer require stripe/stripe-php in your theme folder.' );
+    }
+    require_once $autoload;
+
+    \Stripe\Stripe::setApiKey( STRIPE_SECRET_KEY );
+
+    $amount      = absint( $_POST['amount']      ?? 0 );
+    $description = sanitize_text_field( $_POST['description'] ?? 'Laws & Codes — Project Payment' );
+    $invoice_id  = sanitize_text_field( $_POST['invoice_id']  ?? '' );
+    $email       = sanitize_email(      $_POST['email']       ?? '' );
+
+    if ( $amount < 50 ) {
+        wp_send_json_error( 'Amount too low: ' . $amount . ' cents (Stripe minimum is 50 cents / $0.50).' );
+    }
+
+    try {
+        $intent = \Stripe\PaymentIntent::create( [
+            'amount'      => $amount,
+            'currency'    => 'usd',
+            'description' => $description,
+            'metadata'    => [
+                'invoice_id'   => $invoice_id,
+                'client_email' => $email,
+            ],
+            'receipt_email'             => $email ?: null,
+            'automatic_payment_methods' => [ 'enabled' => true ],
+        ] );
+
+        wp_send_json_success( [
+            'clientSecret' => $intent->client_secret,
+            'intentId'     => $intent->id,
+        ] );
+
+    } catch ( \Stripe\Exception\ApiErrorException $e ) {
+        wp_send_json_error( $e->getMessage() );
+    }
 }
-add_action( 'widgets_init', 'lc_widgets_init' );
 
-// ── CLEAN UP WP HEAD ──────────────────────────────────────
-remove_action( 'wp_head', 'wp_generator' );
-remove_action( 'wp_head', 'wlwmanifest_link' );
-remove_action( 'wp_head', 'rsd_link' );
-remove_action( 'wp_head', 'wp_shortlink_wp_head' );
-remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10 );
-
-// ── CUSTOM IMAGE SIZES IN MEDIA LIBRARY ───────────────────
-function lc_custom_image_sizes( $sizes ) {
-    return array_merge( $sizes, [
-        'lc-project-thumb' => __( 'Project Thumbnail', 'laws-codes' ),
-        'lc-project-hero'  => __( 'Project Hero',      'laws-codes' ),
-        'lc-project-card'  => __( 'Project Card',      'laws-codes' ),
-    ]);
+// ── STRIPE: Payment notification email ────────────────────
+function lc_notify_payment_received( $intent ) {
+    $to      = get_option( 'admin_email' );
+    $amount  = number_format( $intent->amount / 100, 2 );
+    $invoice = $intent->metadata->invoice_id   ?? 'N/A';
+    $client  = $intent->metadata->client_email ?? 'Unknown';
+    $subject = "Payment received — \${$amount} · Invoice {$invoice}";
+    $body    = "A payment of \${$amount} USD was received.\n\nInvoice: {$invoice}\nClient: {$client}\nStripe ID: {$intent->id}";
+    wp_mail( $to, $subject, $body );
 }
-add_filter( 'image_size_names_choose', 'lc_custom_image_sizes' );
 
-// ── SEO TITLE HELPER ──────────────────────────────────────
-function lc_document_title_separator( $sep ) {
-    return '—';
-}
-add_filter( 'document_title_separator', 'lc_document_title_separator' );
-
-// ── EXCERPT LENGTH ────────────────────────────────────────
-add_filter( 'excerpt_length', fn() => 28 );
-add_filter( 'excerpt_more',   fn() => '...' );
-
-//SAVE LOCAL JSON
-
-add_filter( 'acf/settings/save_json', function () {
-    return get_stylesheet_directory() . '/acf-json';
-} );
-
-add_filter( 'acf/settings/load_json', function ( $paths ) {
-    $paths[] = get_stylesheet_directory() . '/acf-json';
-    return $paths;
-} );
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 4. STRIPE — WP_AJAX handlers registration
-//    (The actual functions live in stripe/page-payment.php which is loaded
-//     when the template is rendered. To use them globally, you can move the
-//     function definitions here and remove them from the template.)
-// ══════════════════════════════════════════════════════════════════════════════
-
-// Uncomment if you move lc_create_payment_intent() here:
-// add_action( 'wp_ajax_nopriv_lc_create_payment_intent', 'lc_create_payment_intent' );
-// add_action( 'wp_ajax_lc_create_payment_intent',        'lc_create_payment_intent' );
-
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 5. STRIPE WEBHOOK ENDPOINT
-//    Add this early (before headers send) so the webhook fires on any request.
-//    Alternatively handle via a custom REST route (see below).
-// ══════════════════════════════════════════════════════════════════════════════
+// ── STRIPE: Webhook (init hook for ?stripe_webhook=1) ─────
 add_action( 'init', function () {
     if ( isset( $_GET['stripe_webhook'] ) && $_GET['stripe_webhook'] === '1' ) {
         if ( function_exists( 'lc_handle_stripe_webhook' ) ) {
@@ -525,20 +474,13 @@ add_action( 'init', function () {
     }
 } );
 
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 6. ALTERNATIVE: Stripe webhook as WP REST API endpoint
-//    URL: https://yourdomain.com/wp-json/lawscodes/v1/stripe-webhook
-//    (Use this URL in Stripe Dashboard instead of ?stripe_webhook=1)
-// ══════════════════════════════════════════════════════════════════════════════
+// ── STRIPE: Webhook via REST API ──────────────────────────
 add_action( 'rest_api_init', function () {
-
     register_rest_route( 'lawscodes/v1', '/stripe-webhook', [
         'methods'             => 'POST',
         'callback'            => 'lc_rest_stripe_webhook',
         'permission_callback' => '__return_true',
     ] );
-
 } );
 
 function lc_rest_stripe_webhook( WP_REST_Request $request ) {
@@ -546,52 +488,34 @@ function lc_rest_stripe_webhook( WP_REST_Request $request ) {
         return new WP_REST_Response( [ 'error' => 'Not configured' ], 400 );
     }
 
-    $theme_dir = get_template_directory();
-    if ( file_exists( $theme_dir . '/vendor/autoload.php' ) ) {
-        require_once $theme_dir . '/vendor/autoload.php';
+    $autoload = get_template_directory() . '/vendor/autoload.php';
+    if ( file_exists( $autoload ) ) {
+        require_once $autoload;
     }
 
     \Stripe\Stripe::setApiKey( STRIPE_SECRET_KEY );
 
-    $payload = $request->get_body();
-    $sig     = $request->get_header( 'stripe-signature' );
-
     try {
-        $event = \Stripe\Webhook::constructEvent( $payload, $sig, STRIPE_WEBHOOK_SECRET );
+        $event = \Stripe\Webhook::constructEvent(
+            $request->get_body(),
+            $request->get_header( 'stripe-signature' ),
+            STRIPE_WEBHOOK_SECRET
+        );
     } catch ( \Exception $e ) {
         return new WP_REST_Response( [ 'error' => $e->getMessage() ], 400 );
     }
 
-    switch ( $event->type ) {
-        case 'payment_intent.succeeded':
-            $intent = $event->data->object;
-            lc_notify_payment_received( $intent );
-            break;
-        case 'payment_intent.payment_failed':
-            // Log or email client about failed payment
-            break;
+    if ( $event->type === 'payment_intent.succeeded' ) {
+        lc_notify_payment_received( $event->data->object );
     }
 
     return new WP_REST_Response( [ 'received' => true ], 200 );
 }
 
-
-// ══════════════════════════════════════════════════════════════════════════════
-// 7. HELPER: Generate a payment link programmatically
-//    Use this in admin or via a custom dashboard to send invoice links.
-// ══════════════════════════════════════════════════════════════════════════════
-
-/**
- * Generate a Stripe payment page URL.
- *
- * @param string $invoice_id  e.g. 'INV-2024-001'
- * @param int    $amount_usd  Amount in dollars (will be converted to cents)
- * @param string $description e.g. '50% Deposit — Project Name'
- * @return string
- */
+// ── STRIPE: Payment URL helper ────────────────────────────
 function lc_payment_url( string $invoice_id, int $amount_usd, string $description = '' ): string {
     $page = get_page_by_path( 'payment' );
-    if ( ! $page ) return home_url('/payment/');
+    if ( ! $page ) return home_url( '/payment/' );
 
     return add_query_arg( [
         'invoice' => rawurlencode( $invoice_id ),
@@ -600,23 +524,35 @@ function lc_payment_url( string $invoice_id, int $amount_usd, string $descriptio
     ], get_permalink( $page ) );
 }
 
-// Example usage:
-// $link = lc_payment_url( 'INV-2024-042', 1200, '50% Deposit — Brow Beast Redesign' );
-// Then email it to the client.
-
-
-//Project Image
-add_image_size( 'lc-project-hero', 800, 380, true ); // true = hard crop
-
-require_once get_template_directory() . '/inc/search-ajax.php';
-
-// Enqueue the JS
-add_action('wp_enqueue_scripts', function() {
-  wp_enqueue_script(
-    'lawscodes-search',
-    get_template_directory_uri() . '/src/modules/search.js',
-    ['lawscodes-main'], // depends on your main script handle
-    null,
-    true
-  );
+// ── WIDGET AREAS ──────────────────────────────────────────
+add_action( 'widgets_init', function () {
+    register_sidebar([
+        'name'          => __( 'Footer Widget Area', 'laws-codes' ),
+        'id'            => 'footer-1',
+        'before_widget' => '<div id="%1$s" class="widget %2$s">',
+        'after_widget'  => '</div>',
+        'before_title'  => '<h3 class="widget-title">',
+        'after_title'   => '</h3>',
+    ]);
 });
+
+// ── CLEAN UP WP HEAD ──────────────────────────────────────
+remove_action( 'wp_head', 'wp_generator' );
+remove_action( 'wp_head', 'wlwmanifest_link' );
+remove_action( 'wp_head', 'rsd_link' );
+remove_action( 'wp_head', 'wp_shortlink_wp_head' );
+remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10 );
+
+// ── MEDIA LIBRARY CUSTOM SIZES ────────────────────────────
+add_filter( 'image_size_names_choose', function ( $sizes ) {
+    return array_merge( $sizes, [
+        'lc-project-thumb' => __( 'Project Thumbnail', 'laws-codes' ),
+        'lc-project-hero'  => __( 'Project Hero',      'laws-codes' ),
+        'lc-project-card'  => __( 'Project Card',      'laws-codes' ),
+    ]);
+});
+
+// ── SEO & EXCERPT ─────────────────────────────────────────
+add_filter( 'document_title_separator', fn() => '—' );
+add_filter( 'excerpt_length',           fn() => 28 );
+add_filter( 'excerpt_more',             fn() => '...' );

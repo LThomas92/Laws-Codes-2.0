@@ -173,23 +173,6 @@ get_header(); ?>
 
   <?php endif; ?>
 
-  <!-- CTA -->
-  <section class="lc-cta-section">
-    <?php
-    $cta       = get_field('page_cta');
-    $cta_hl    = $cta['cta_headline']     ?? "Let's build something you're proud of.";
-    $cta_sub   = $cta['cta_sub']          ?? 'No jargon. No hard sell. Just honest work.';
-    $cta_label = $cta['cta_button_label'] ?? 'Book a discovery call';
-    $cta_url   = $cta['cta_button_url']   ?? get_permalink( get_page_by_path('contact') );
-    ?>
-    <div class="lc-cta-section__kicker">Ready to begin</div>
-    <h2 class="lc-cta-section__h"><?php echo wp_kses_post( $cta_hl ); ?></h2>
-    <p class="lc-cta-section__sub"><?php echo esc_html( $cta_sub ); ?></p>
-    <div class="lc-cta-section__slots">◆ Only 2 project slots open this quarter ◆</div>
-    <a href="<?php echo esc_url( $cta_url ); ?>" class="lc-cta-section__btn">
-      <?php echo esc_html( $cta_label ); ?>
-    </a>
-  </section>
 
 </main>
 

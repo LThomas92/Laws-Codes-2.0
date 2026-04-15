@@ -104,116 +104,159 @@
 }
 
 
-// ─── Case Study Grid ──────────────────────────────────────────────────────────
+// ─── Case Study Grid — card design ────────────────────────────────────────────
 .cs-grid {
-  display:        flex;
-  flex-direction: column;
-  border:         1px solid var(--navy-border);
-  border-radius:  12px;
-  overflow:       hidden;
-  box-shadow:     var(--sh-sm);
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap:                   16px;
+  &--home {
+    margin-top: 2rem;
+  }
 }
 
+// The article itself has no visual — the <a> inside is the card
 .cs-item {
-  display:     grid;
-  grid-template-columns: 180px 1fr auto;
-  border-bottom: 1px solid var(--navy-border);
-  cursor:        pointer;
-  transition:    background .12s;
-  outline-offset: -2px;
-
-  &:last-child { border-bottom: none; }
-
-  &:hover { background: var(--navy-light); }
-  &:hover .cs-arr { color: var(--navy); }
-  &:focus-visible { outline: 2px solid var(--tan2); }
+  display: block;
 }
 
-.cs-thumb {
+.cs-item__link {
   display:         flex;
-  align-items:     center;
-  justify-content: center;
-  font-family:     var(--serif);
-  font-size:       12px;
-  color:           rgba(255, 255, 255, .4);
-  border-right:    1px solid var(--navy-border);
-  min-height:      110px;
+  flex-direction:  column;
+  background:      var(--white);
+  border:          1px solid var(--navy-border);
+  border-radius:   12px;
+  overflow:        hidden;
+  text-decoration: none;
+  color:           inherit;
+  height:          100%;
+  box-shadow:      var(--sh-sm);
+  transition:      box-shadow .18s, transform .18s;
+
+  &:hover {
+    box-shadow: var(--sh-md);
+    transform:  translateY(-3px);
+
+    .cs-item__arrow  { transform: translateX(4px); color: var(--tan2); }
+    .cs-item__thumb  { filter: brightness(1.1); }
+  }
+
+  &:focus-visible { outline: 2px solid var(--tan2); outline-offset: 2px; }
 }
 
-.cs-body {
-  padding:        22px 26px;
-  display:        flex;
-  flex-direction: column;
-  justify-content: center;
+// Coloured top panel with initials + KPI
+.cs-item__thumb {
+  position:   relative;
+  height:     140px;
+  display:    flex;
+  align-items: center;
+  justify-content: space-between;
+  padding:    20px 22px;
+  transition: filter .18s;
 }
 
-.cs-tags {
-  display:       flex;
-  gap:           0;
-  margin-bottom: 7px;
+.cs-item__initials {
+  font-family: var(--serif);
+  font-size:   28px;
+  font-weight: 400;
+  color:       rgba(255, 255, 255, .2);
+  line-height: 1;
+  letter-spacing: -.01em;
 }
 
-.cs-tag {
+.cs-item__kpi {
+  text-align: right;
+}
+
+.cs-item__kpi-n {
+  font-family: var(--serif);
+  font-size:   32px;
+  font-weight: 400;
+  color:       rgba(255, 255, 255, .9);
+  line-height: 1;
+  display:     block;
+}
+
+.cs-item__kpi-l {
   font-family:    var(--mono);
-  font-size:      10px;
+  font-size:      9px;
+  color:          rgba(255, 255, 255, .55);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  display:        block;
+  margin-top:     3px;
+}
+
+// Content area
+.cs-item__content {
+  flex:    1;
+  padding: 18px 20px 14px;
+}
+
+.cs-item__meta-row {
+  display:       flex;
+  gap:           6px;
+  flex-wrap:     wrap;
+  margin-bottom: 8px;
+}
+
+.cs-item__tag {
+  font-family:    var(--mono);
+  font-size:      9px;
   color:          var(--navy);
-  letter-spacing: .06em;
+  letter-spacing: .07em;
   text-transform: uppercase;
   opacity:        .5;
 
-  &::after {
-    content: '·';
-    margin:  0 8px;
-    opacity: .4;
-  }
+  &::after    { content: "·"; margin: 0 4px; opacity: .4; }
   &:last-child::after { display: none; }
 }
 
-.cs-title {
+.cs-item__title {
   font-family:   var(--serif);
-  font-size:     21px;
+  font-size:     20px;
   font-weight:   400;
   color:         var(--navy);
-  margin-bottom: 5px;
+  margin-bottom: 4px;
+  line-height:   1.2;
 }
 
-.cs-desc {
+.cs-item__industry {
+  font-family:   var(--mono);
+  font-size:     10px;
+  color:         var(--tan2);
+  letter-spacing: .06em;
+  margin-bottom: 8px;
+}
+
+.cs-item__desc {
   font-size:   13px;
   color:       var(--muted);
-  line-height: 1.7;
+  line-height: 1.65;
   font-weight: 300;
-  max-width:   440px;
 }
 
-.cs-meta {
-  padding:     22px 24px;
-  display:     flex;
-  align-items: center;
-  gap:         14px;
-  border-left: 1px solid var(--navy-border);
+// Bottom CTA row
+.cs-item__cta {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         12px 20px;
+  border-top:      1px solid var(--navy-border);
+  margin-top:      auto;
 }
 
-.cs-kpi-n {
-  font-family: var(--serif);
-  font-size:   26px;
-  color:       var(--navy);
-  font-weight: 400;
-  text-align:  right;
-}
-
-.cs-kpi-l {
+.cs-item__cta-text {
   font-family:    var(--mono);
   font-size:      10px;
   color:          var(--muted);
-  letter-spacing: .04em;
-  text-align:     right;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 
-.cs-arr {
-  font-size:  16px;
+.cs-item__arrow {
+  font-size:  14px;
   color:      var(--light);
-  margin-left: 12px;
-  transition: color .12s;
+  transition: transform .14s ease, color .14s ease;
 }
 
 .work-grid__empty {
@@ -307,8 +350,6 @@
   .work-hero           { padding: 52px 24px; }
   .work-filters        { padding: 0 16px; }
 
-  .cs-item             { grid-template-columns: 60px 1fr auto; }
-  .cs-thumb            { min-height: 80px; font-size: 10px; }
 
   .tgrid               { grid-template-columns: 1fr; }
 
@@ -316,28 +357,6 @@
   .lc-cta-section      { padding: 52px 24px; }
 }
 
-
-// ─── cs-item link wrapper fix ─────────────────────────────────────────────────
-// The cs-item now uses an <a> wrapper instead of onclick — reset link styles
-// so the grid layout is preserved and nothing bleeds outside the card.
-
-.cs-item {
-  // override cursor set above — the <a> handles it
-  cursor: default;
-
-  &__link {
-    display:         grid;
-    grid-template-columns: 180px 1fr auto;
-    width:           100%;
-    text-decoration: none;
-    color:           inherit;
-    transition:      background .12s;
-
-    &:hover            { background: var(--navy-light); }
-    &:hover .cs-arr    { color: var(--navy); }
-    &:focus-visible    { outline: 2px solid var(--tan2); outline-offset: -2px; }
-  }
-}
 
 
 // ─── Toolbar (filters + search row) ──────────────────────────────────────────
@@ -632,4 +651,10 @@
 
   .cs-item__link { grid-template-columns: 60px 1fr auto; }
   .cs-thumb      { min-height: 80px; font-size: 10px; }
+}
+
+
+// ─── New card grid responsive ──────────────────────────────────────────────────
+@media (max-width: 600px) {
+  .cs-grid { grid-template-columns: 1fr; }
 }

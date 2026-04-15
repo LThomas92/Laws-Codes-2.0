@@ -1,0 +1,237 @@
+// =============================================================================
+// 404 PAGE  —  _404.scss
+// Laws & Codes · lawscodes.com
+// =============================================================================
+
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+
+.lc-404 { background: var(--white); }
+
+.error-hero {
+  padding:    80px 48px 72px;
+  background: var(--white);
+  border-bottom: 1px solid var(--navy-border);
+  position:   relative;
+  overflow:   hidden;
+
+  &__inner {
+    display:     grid;
+    grid-template-columns: 1fr 1fr;
+    gap:         48px;
+    align-items: center;
+    position:    relative;
+    z-index:     1;
+  }
+
+  // Giant 404 behind content
+  &__code {
+    position:    absolute;
+    left:        -24px;
+    top:         50%;
+    transform:   translateY(-50%);
+    font-family: var(--serif);
+    font-size:   clamp(160px, 20vw, 280px);
+    font-weight: 700;
+    color:       var(--navy-light);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -.04em;
+  }
+
+  &__content { position: relative; z-index: 1; }
+
+  &__tag {
+    display:        inline-flex;
+    align-items:    center;
+    gap:            10px;
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--muted);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom:  24px;
+  }
+
+  &__dash {
+    display:    block;
+    width:      22px;
+    height:     1px;
+    background: var(--tan2);
+  }
+
+  &__h1 {
+    font-family:    var(--serif);
+    font-size:      clamp(36px, 5vw, 56px);
+    font-weight:    400;
+    color:          var(--navy);
+    line-height:    1.08;
+    letter-spacing: -.02em;
+    margin-bottom:  18px;
+
+    em { font-style: italic; color: var(--tan2); }
+  }
+
+  &__sub {
+    font-size:     14px;
+    color:         var(--muted);
+    line-height:   1.85;
+    font-weight:   300;
+    max-width:     440px;
+    margin-bottom: 32px;
+  }
+
+  &__actions {
+    display:   flex;
+    gap:       12px;
+    flex-wrap: wrap;
+  }
+}
+
+
+// ─── Buttons ──────────────────────────────────────────────────────────────────
+
+.error-btn {
+  display:         inline-flex;
+  align-items:     center;
+  height:          44px;
+  padding:         0 28px;
+  border-radius:   5px;
+  font-size:       11px;
+  font-family:     var(--sans);
+  font-weight:     500;
+  letter-spacing:  .07em;
+  text-transform:  uppercase;
+  text-decoration: none;
+  transition:      opacity .14s, background .14s, border-color .14s;
+
+  &--primary {
+    background: var(--navy);
+    color:      var(--tan);
+    border:     none;
+    box-shadow: 0 3px 14px rgba(7, 9, 69, 0.22);
+
+    &:hover { opacity: .88; }
+  }
+
+  &--ghost {
+    background:   transparent;
+    color:        var(--navy);
+    border:       1.5px solid var(--navy-border);
+
+    &:hover {
+      background:   var(--navy-light);
+      border-color: var(--navy);
+    }
+  }
+}
+
+
+// ─── Suggestions grid (reuses .cs-* classes from _work.scss) ─────────────────
+
+.error-suggestions {
+  &__grid {
+    // cs-grid is flex-column, limit to 3 items
+    .cs-item:nth-child(n+4) { display: none; }
+  }
+}
+
+
+// ─── Navigation grid ──────────────────────────────────────────────────────────
+
+.error-nav-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap:                   12px;
+  margin-top:            36px;
+}
+
+.error-nav-item {
+  display:         flex;
+  flex-direction:  column;
+  gap:             4px;
+  padding:         20px 20px 18px;
+  background:      var(--white);
+  border:          1px solid var(--navy-border);
+  border-radius:   10px;
+  text-decoration: none;
+  position:        relative;
+  overflow:        hidden;
+  box-shadow:      var(--sh-xs);
+  transition:      background .12s, box-shadow .16s, transform .16s;
+
+  &::before {
+    content:        attr(data-n);
+    position:       absolute;
+    right:          12px;
+    top:            8px;
+    font-family:    var(--serif);
+    font-size:      48px;
+    font-weight:    700;
+    color:          var(--navy-light);
+    line-height:    1;
+    pointer-events: none;
+  }
+
+  &:hover {
+    background:   var(--navy-light);
+    box-shadow:   var(--sh-sm);
+    transform:    translateY(-2px);
+
+    .error-nav-item__arrow {
+      opacity:   1;
+      transform: translateX(0);
+    }
+  }
+
+  &__num {
+    font-family:    var(--mono);
+    font-size:      10px;
+    color:          var(--tan2);
+    letter-spacing: .10em;
+    font-weight:    700;
+    margin-bottom:  8px;
+  }
+
+  &__label {
+    font-family: var(--serif);
+    font-size:   20px;
+    font-weight: 400;
+    color:       var(--navy);
+  }
+
+  &__desc {
+    font-size:   12px;
+    color:       var(--muted);
+    font-weight: 300;
+    line-height: 1.5;
+    margin-top:  4px;
+  }
+
+  &__arrow {
+    font-size:   14px;
+    color:       var(--tan2);
+    margin-top:  12px;
+    opacity:     0;
+    transform:   translateX(-6px);
+    transition:  opacity .14s, transform .14s;
+    line-height: 1;
+  }
+}
+
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .error-hero              { padding: 52px 24px 48px; }
+  .error-hero__inner       { grid-template-columns: 1fr; }
+  .error-hero__code        { font-size: 120px; opacity: .6; }
+  .error-nav-grid          { grid-template-columns: 1fr 1fr; }
+  .section                 { padding: 48px 24px; }
+  .lc-cta-section          { padding: 52px 24px; }
+}
+
+@media (max-width: 480px) {
+  .error-nav-grid { grid-template-columns: 1fr; }
+}

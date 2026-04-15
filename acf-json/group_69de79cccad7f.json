@@ -473,6 +473,48 @@
             "placeholder": "",
             "prepend": "",
             "append": ""
+        },
+        {
+            "key": "field_69dfd82840f58",
+            "label": "Case Study Featured",
+            "name": "cs_featured",
+            "aria-label": "",
+            "type": "true_false",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "ui_on_text": "",
+            "ui_off_text": "",
+            "ui": 0
+        },
+        {
+            "key": "field_69dfd883641ef",
+            "label": "Case Study Switcher Order",
+            "name": "cs_switcher_order",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "min": "",
+            "max": "",
+            "placeholder": "",
+            "step": "",
+            "prepend": "",
+            "append": ""
         }
     ],
     "location": [
@@ -481,6 +523,13 @@
                 "param": "post_type",
                 "operator": "==",
                 "value": "lc_project"
+            }
+        ],
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "lc_case_study"
             }
         ]
     ],
@@ -493,5 +542,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1776203432
+    "modified": 1776277693
 }

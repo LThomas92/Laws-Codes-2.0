@@ -1,33 +1,10 @@
 <?php
 /**
  * Template Name: Work
- *
- * ACF Fields Required (ACF > Field Groups > "Work Page"):
- *
- * HERO GROUP (hero)
- *   - hero_kicker      (text)
- *   - hero_headline    (text)
- *   - hero_headline_em (text)   italic accent
- *   - hero_subtext     (textarea)
- *
- * FILTER LABELS (work_filters) — repeater
- *   - filter_label     (text)   e.g. "All", "WordPress", "E-Commerce"
- *   - filter_slug      (text)   e.g. "all", "wordpress", "ecommerce"
- *
- * CASE STUDIES — Custom Post Type "lc_case_study"
- *   - cs_industry / cs_location / cs_year / cs_description
- *   - cs_tags          comma-separated display tags
- *   - cs_kpi_number / cs_kpi_label
- *   - cs_bg_color / cs_initials
- *   - cs_filter_tags   comma-separated slugs (no spaces)
- *
- * TESTIMONIALS REPEATER (work_testimonials)
- *   - wt_quote / wt_name / wt_role / wt_initials
  */
 
 get_header();
 
-// Build search data for JS
 $cs_search_data = [];
 foreach ( get_posts(['post_type'=>'lc_case_study','posts_per_page'=>-1,'orderby'=>'menu_order','order'=>'ASC']) as $p ) {
   $cs_search_data[] = [
@@ -52,32 +29,23 @@ $sub     = $hero['hero_subtext']     ?? 'Every project is a partnership — buil
 
 <main class="lc-work" id="main">
 
-  <!-- HERO -->
   <section class="work-hero">
     <div class="work-hero__inner">
-      <div class="work-hero__tag">
-        <span class="work-hero__dash"></span>
-        <?php echo esc_html( $kicker ); ?>
-      </div>
-      <h1 class="work-hero__h1">
-        <?php echo wp_kses_post( str_replace( esc_html($em_word), '<em>'.esc_html($em_word).'</em>', esc_html($hl) ) ); ?>
-      </h1>
+      <div class="work-hero__tag"><span class="work-hero__dash"></span><?php echo esc_html($kicker); ?></div>
+      <h1 class="work-hero__h1"><?php echo wp_kses_post(str_replace(esc_html($em_word),'<em>'.esc_html($em_word).'</em>',esc_html($hl))); ?></h1>
       <p class="work-hero__sub"><?php echo esc_html($sub); ?></p>
     </div>
   </section>
 
-  <!-- TOOLBAR: filters + search -->
   <div class="work-toolbar">
-
     <div class="work-filters" role="group" aria-label="Filter projects">
       <?php
       $filters = get_field('work_filters');
-      if ( $filters ) :
-        foreach ( $filters as $i => $f ) : ?>
-        <button
-          type="button"
+      if ($filters) :
+        foreach ($filters as $i => $f) : ?>
+        <button type="button"
           class="work-filter<?php echo $i === 0 ? ' work-filter--active' : ''; ?>"
-          data-filter="<?php echo esc_attr($f['filter_slug']); ?>"
+          data-filter="<?php echo esc_attr(trim($f['filter_slug'])); ?>"
           aria-pressed="<?php echo $i === 0 ? 'true' : 'false'; ?>"
         ><?php echo esc_html($f['filter_label']); ?></button>
         <?php endforeach;
@@ -94,17 +62,8 @@ $sub     = $hero['hero_subtext']     ?? 'Every project is a partnership — buil
         <svg class="work-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input
-          class="work-search__input"
-          id="cs-search-input"
-          type="search"
-          placeholder="Search projects…"
-          autocomplete="off"
-          aria-label="Search projects"
-          aria-expanded="false"
-          aria-haspopup="listbox"
-          aria-controls="cs-search-dropdown"
-        >
+        <input class="work-search__input" id="cs-search-input" type="search"
+          placeholder="Search projects..." autocomplete="off" aria-label="Search projects">
         <button class="work-search__clear" id="cs-search-clear" type="button" aria-label="Clear search" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -118,12 +77,9 @@ $sub     = $hero['hero_subtext']     ?? 'Every project is a partnership — buil
         </div>
       </div>
     </div>
-
   </div>
 
-  <!-- GRID -->
   <section class="work-grid section">
-
     <div class="work-search-banner" id="work-search-banner" hidden>
       Showing results for "<strong id="work-search-banner-term"></strong>"
       <button type="button" class="work-search-banner__clear" id="work-search-banner-clear">Clear ×</button>
@@ -133,59 +89,75 @@ $sub     = $hero['hero_subtext']     ?? 'Every project is a partnership — buil
     $cs_query = new WP_Query(['post_type'=>'lc_case_study','posts_per_page'=>-1,'orderby'=>'menu_order','order'=>'ASC']);
     ?>
 
-    <?php if ( $cs_query->have_posts() ) : ?>
+    <?php if ($cs_query->have_posts()) : ?>
     <div class="cs-grid" id="cs-grid">
-      <?php while ( $cs_query->have_posts() ) :
+      <?php while ($cs_query->have_posts()) :
         $cs_query->the_post();
-        $pid         = get_the_ID();
         $bg          = get_field('cs_bg_color')   ?: '#0e0c2e';
         $initials    = get_field('cs_initials')   ?: '';
         $tags_raw    = get_field('cs_tags')        ?: '';
         $tags        = array_filter(array_map('trim', explode(',', $tags_raw)));
         $kpi_n       = get_field('cs_kpi_number') ?: '';
         $kpi_l       = get_field('cs_kpi_label')  ?: '';
+        $industry    = get_field('cs_industry')   ?: '';
+        $location    = get_field('cs_location')   ?: '';
         $filter_tags = trim(get_field('cs_filter_tags') ?: 'all');
         $link        = get_permalink();
         $title       = get_the_title();
         $desc        = get_field('cs_description') ?: '';
-        $data_tags   = 'all,' . str_replace(' ', '', $filter_tags);
+
+        // Normalise filter tags: always include 'all', strip spaces around commas
+        $filter_arr    = array_filter(array_map('trim', explode(',', $filter_tags)));
+        $filter_arr[]  = 'all';
+        $filter_string = implode(',', array_unique($filter_arr));
       ?>
       <article
         class="cs-item"
-        data-tags="<?php echo esc_attr($data_tags); ?>"
+        data-tags="<?php echo esc_attr($filter_string); ?>"
         data-title="<?php echo esc_attr(strtolower($title)); ?>"
         data-tags-text="<?php echo esc_attr(strtolower($tags_raw)); ?>"
         data-desc="<?php echo esc_attr(strtolower($desc)); ?>"
       >
         <a class="cs-item__link" href="<?php echo esc_url($link); ?>" aria-label="View <?php echo esc_attr($title); ?> case study">
-          <div class="cs-thumb" style="background:<?php echo esc_attr($bg); ?>" aria-hidden="true">
-            <?php echo esc_html($initials); ?>
-          </div>
-          <div class="cs-body">
-            <div class="cs-tags" aria-hidden="true">
-              <?php foreach ($tags as $t) : ?>
-                <span class="cs-tag"><?php echo esc_html($t); ?></span>
-              <?php endforeach; ?>
-            </div>
-            <div class="cs-title"><?php echo esc_html($title); ?></div>
-            <div class="cs-desc"><?php echo esc_html($desc); ?></div>
-          </div>
-          <div class="cs-meta" aria-hidden="true">
+
+          <!-- Coloured thumbnail -->
+          <div class="cs-item__thumb" style="background:<?php echo esc_attr($bg); ?>">
+            <span class="cs-item__initials" aria-hidden="true"><?php echo esc_html($initials); ?></span>
             <?php if ($kpi_n) : ?>
-            <div>
-              <div class="cs-kpi-n"><?php echo esc_html($kpi_n); ?></div>
-              <div class="cs-kpi-l"><?php echo esc_html($kpi_l); ?></div>
+            <div class="cs-item__kpi">
+              <span class="cs-item__kpi-n"><?php echo esc_html($kpi_n); ?></span>
+              <span class="cs-item__kpi-l"><?php echo esc_html($kpi_l); ?></span>
             </div>
             <?php endif; ?>
-            <div class="cs-arr">→</div>
           </div>
+
+          <!-- Content -->
+          <div class="cs-item__content">
+            <div class="cs-item__meta-row">
+              <?php foreach ($tags as $t) : ?>
+                <span class="cs-item__tag"><?php echo esc_html($t); ?></span>
+              <?php endforeach; ?>
+            </div>
+            <h3 class="cs-item__title"><?php echo esc_html($title); ?></h3>
+            <?php if ($industry || $location) : ?>
+            <p class="cs-item__industry"><?php echo esc_html(implode(' · ', array_filter([$industry, $location]))); ?></p>
+            <?php endif; ?>
+            <p class="cs-item__desc"><?php echo esc_html($desc); ?></p>
+          </div>
+
+          <!-- Arrow CTA -->
+          <div class="cs-item__cta" aria-hidden="true">
+            <span class="cs-item__cta-text">View project</span>
+            <span class="cs-item__arrow">&#8594;</span>
+          </div>
+
         </a>
       </article>
       <?php endwhile; wp_reset_postdata(); ?>
     </div>
 
     <div class="cs-empty" id="cs-empty" hidden>
-      <div class="cs-empty__icon">◎</div>
+      <div class="cs-empty__icon">&#9675;</div>
       <p class="cs-empty__text">No projects match that search.</p>
       <button type="button" class="cs-empty__reset" id="cs-empty-reset">Show all projects</button>
     </div>
@@ -193,12 +165,9 @@ $sub     = $hero['hero_subtext']     ?? 'Every project is a partnership — buil
     <?php else : ?>
     <p class="work-grid__empty">No case studies yet — check back soon.</p>
     <?php endif; ?>
-
   </section>
 
-  <?php
-  $testimonials = get_field('work_testimonials');
-  if ($testimonials) : ?>
+  <?php $testimonials = get_field('work_testimonials'); if ($testimonials) : ?>
   <section class="work-testimonials section section--alt">
     <div class="section__header">
       <div class="section__kicker">Social proof</div>
@@ -226,7 +195,7 @@ $sub     = $hero['hero_subtext']     ?? 'Every project is a partnership — buil
     <div class="lc-cta-section__kicker">Ready to begin</div>
     <h2 class="lc-cta-section__h">Let's build something<br>you're proud of.</h2>
     <p class="lc-cta-section__sub">No jargon. No hard sell. Just honest work.</p>
-    <div class="lc-cta-section__slots">◆ Only 2 project slots open this quarter ◆</div>
+    <div class="lc-cta-section__slots">&#9670; Only 2 project slots open this quarter &#9670;</div>
     <a href="<?php echo esc_url(get_permalink(get_page_by_path('contact'))); ?>" class="lc-cta-section__btn">Book a discovery call</a>
   </section>
 
@@ -236,46 +205,54 @@ $sub     = $hero['hero_subtext']     ?? 'Every project is a partnership — buil
 const LC_PROJECTS = <?php echo wp_json_encode($cs_search_data); ?>;
 
 (function(){
-  const filterBtns     = document.querySelectorAll('.work-filter');
-  const csItems        = document.querySelectorAll('.cs-item');
-  const csEmpty        = document.getElementById('cs-empty');
-  const searchInput    = document.getElementById('cs-search-input');
-  const searchClear    = document.getElementById('cs-search-clear');
-  const searchDropdown = document.getElementById('cs-search-dropdown');
-  const searchResults  = document.getElementById('cs-search-results');
-  const searchNoRes    = document.getElementById('cs-search-no-results');
-  const searchTermEl   = document.getElementById('cs-search-term');
-  const banner         = document.getElementById('work-search-banner');
-  const bannerTerm     = document.getElementById('work-search-banner-term');
-  const bannerClear    = document.getElementById('work-search-banner-clear');
-  const emptyReset     = document.getElementById('cs-empty-reset');
 
-  let activeFilter  = 'all';
-  let activeSearch  = '';
-  let selectedIndex = -1;
+  // ── Filter buttons ──────────────────────────────────────────────────────────
+  const filterBtns  = document.querySelectorAll('.work-filter');
+  const csItems     = document.querySelectorAll('.cs-item');
+  const csEmpty     = document.getElementById('cs-empty');
+  const emptyReset  = document.getElementById('cs-empty-reset');
 
-  /* ── Apply filter + search ── */
-  function applyState(){
-    let count = 0;
+  // Search elements
+  const searchInput = document.getElementById('cs-search-input');
+  const searchClear = document.getElementById('cs-search-clear');
+  const dropdown    = document.getElementById('cs-search-dropdown');
+  const results     = document.getElementById('cs-search-results');
+  const noResults   = document.getElementById('cs-search-no-results');
+  const termEl      = document.getElementById('cs-search-term');
+  const banner      = document.getElementById('work-search-banner');
+  const bannerTerm  = document.getElementById('work-search-banner-term');
+  const bannerClear = document.getElementById('work-search-banner-clear');
+
+  let activeFilter = 'all';
+  let activeSearch = '';
+  let selIdx       = -1;
+
+  // ── Core: apply current filter + search state ───────────────────────────────
+  function applyState() {
+    let visible = 0;
     csItems.forEach(item => {
-      const itemTags = item.dataset.tags.split(',');
+      // data-tags is already normalised: "all,wordpress,ecommerce" etc.
+      const itemTags = item.dataset.tags ? item.dataset.tags.split(',') : ['all'];
+
       const filterOK = activeFilter === 'all' || itemTags.includes(activeFilter);
       const searchOK = activeSearch === '' ||
         (item.dataset.title    || '').includes(activeSearch) ||
         (item.dataset.desc     || '').includes(activeSearch) ||
         (item.dataset.tagsText || '').includes(activeSearch);
+
       const show = filterOK && searchOK;
       item.hidden = !show;
-      if(show) count++;
+      if (show) visible++;
     });
-    if(csEmpty) csEmpty.hidden = count > 0;
+    if (csEmpty) csEmpty.hidden = visible > 0;
   }
 
-  /* ── Filter buttons ── */
+  // ── Filter buttons ──────────────────────────────────────────────────────────
   filterBtns.forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      activeFilter = btn.dataset.filter;
+      // Trim in case ACF saved a slug with a stray space
+      activeFilter = (btn.dataset.filter || 'all').trim();
       filterBtns.forEach(b => { b.classList.remove('work-filter--active'); b.setAttribute('aria-pressed','false'); });
       btn.classList.add('work-filter--active');
       btn.setAttribute('aria-pressed','true');
@@ -284,109 +261,105 @@ const LC_PROJECTS = <?php echo wp_json_encode($cs_search_data); ?>;
     });
   });
 
-  /* ── Empty reset ── */
-  if(emptyReset){
+  if (emptyReset) {
     emptyReset.addEventListener('click', () => {
       activeFilter = 'all';
       filterBtns.forEach(b => { b.classList.remove('work-filter--active'); b.setAttribute('aria-pressed','false'); });
       const allBtn = document.querySelector('.work-filter[data-filter="all"]');
-      if(allBtn){ allBtn.classList.add('work-filter--active'); allBtn.setAttribute('aria-pressed','true'); }
-      clearSearch(); applyState();
+      if (allBtn) { allBtn.classList.add('work-filter--active'); allBtn.setAttribute('aria-pressed','true'); }
+      clearSearch();
+      applyState();
     });
   }
 
-  /* ── Search input ── */
+  // ── Search ──────────────────────────────────────────────────────────────────
   searchInput.addEventListener('input', () => {
     const val = searchInput.value.trim().toLowerCase();
     searchClear.hidden = val === '';
-    if(val.length < 1){ closeDropdown(); activeSearch=''; applyState(); hideBanner(); return; }
+    if (val.length < 1) { closeDropdown(); activeSearch=''; hideBanner(); applyState(); return; }
     renderDropdown(val);
   });
 
   searchInput.addEventListener('keydown', e => {
-    const items = searchResults.querySelectorAll('.cs-search-result');
-    if(e.key==='ArrowDown'){ e.preventDefault(); selectedIndex=Math.min(selectedIndex+1,items.length-1); updateSel(items); }
-    else if(e.key==='ArrowUp'){ e.preventDefault(); selectedIndex=Math.max(selectedIndex-1,-1); updateSel(items); }
-    else if(e.key==='Enter'){
+    const items = results.querySelectorAll('.cs-search-result');
+    if (e.key === 'ArrowDown') { e.preventDefault(); selIdx = Math.min(selIdx+1, items.length-1); updateSel(items); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); selIdx = Math.max(selIdx-1,-1); updateSel(items); }
+    else if (e.key === 'Enter') {
       e.preventDefault();
-      if(selectedIndex>=0 && items[selectedIndex]) window.location=items[selectedIndex].dataset.url;
+      if (selIdx >= 0 && items[selIdx]) window.location = items[selIdx].dataset.url;
       else commitSearch(searchInput.value.trim());
     }
-    else if(e.key==='Escape'){ closeDropdown(); searchInput.blur(); }
+    else if (e.key === 'Escape') { closeDropdown(); searchInput.blur(); }
   });
 
-  function updateSel(items){
-    items.forEach((el,i) => { el.classList.toggle('is-selected', i===selectedIndex); if(i===selectedIndex) el.scrollIntoView({block:'nearest'}); });
+  function updateSel(items) {
+    items.forEach((el,i) => { el.classList.toggle('is-selected', i===selIdx); if(i===selIdx) el.scrollIntoView({block:'nearest'}); });
   }
 
   searchClear.addEventListener('click', () => {
-    searchInput.value=''; searchClear.hidden=true; activeSearch='';
-    closeDropdown(); hideBanner(); applyState(); searchInput.focus();
+    searchInput.value=''; searchClear.hidden=true;
+    activeSearch=''; closeDropdown(); hideBanner(); applyState(); searchInput.focus();
   });
 
-  if(bannerClear){
+  if (bannerClear) {
     bannerClear.addEventListener('click', () => {
-      searchInput.value=''; searchClear.hidden=true; activeSearch='';
-      hideBanner(); closeDropdown(); applyState();
+      searchInput.value=''; searchClear.hidden=true;
+      activeSearch=''; hideBanner(); closeDropdown(); applyState();
     });
   }
 
   document.addEventListener('click', e => {
-    if(!document.getElementById('work-search').contains(e.target)) closeDropdown();
+    if (!document.getElementById('work-search').contains(e.target)) closeDropdown();
   });
 
-  /* ── Dropdown ── */
-  function renderDropdown(query){
-    selectedIndex = -1;
+  function renderDropdown(query) {
+    selIdx = -1;
     const matches = LC_PROJECTS.filter(p =>
-      p.title.toLowerCase().includes(query)    ||
+      p.title.toLowerCase().includes(query) ||
       p.industry.toLowerCase().includes(query) ||
-      p.tags.toLowerCase().includes(query)     ||
+      p.tags.toLowerCase().includes(query) ||
       p.desc.toLowerCase().includes(query)
     ).slice(0,6);
 
-    searchResults.innerHTML = '';
+    results.innerHTML = '';
 
-    if(!matches.length){
-      searchNoRes.hidden=false; searchResults.hidden=true;
-      if(searchTermEl) searchTermEl.textContent=query;
+    if (!matches.length) {
+      noResults.hidden = false; results.hidden = true;
+      if (termEl) termEl.textContent = query;
     } else {
-      searchNoRes.hidden=true; searchResults.hidden=false;
+      noResults.hidden = true; results.hidden = false;
       matches.forEach(p => {
         const el = document.createElement('a');
-        el.className='cs-search-result';
-        el.href=p.url; el.dataset.url=p.url;
+        el.className = 'cs-search-result';
+        el.href = p.url; el.dataset.url = p.url;
         el.setAttribute('role','option');
-        el.innerHTML=`
-          <div class="cs-search-result__thumb" style="background:${p.bg}" aria-hidden="true">${esc(p.initials)}</div>
+        el.innerHTML = `
+          <div class="cs-search-result__thumb" style="background:${esc(p.bg)}">${esc(p.initials)}</div>
           <div class="cs-search-result__body">
-            <div class="cs-search-result__title">${highlight(p.title,query)}</div>
+            <div class="cs-search-result__title">${hi(p.title,query)}</div>
             <div class="cs-search-result__meta">${esc(p.industry)}</div>
           </div>
-          <div class="cs-search-result__arrow" aria-hidden="true">→</div>`;
-        el.addEventListener('mousedown', e => { e.preventDefault(); window.location=p.url; });
-        searchResults.appendChild(el);
+          <div class="cs-search-result__arrow">&#8594;</div>`;
+        el.addEventListener('mousedown', e => { e.preventDefault(); window.location = p.url; });
+        results.appendChild(el);
       });
     }
     openDropdown();
   }
 
-  function commitSearch(query){
-    if(!query) return;
-    activeSearch=query.toLowerCase();
-    closeDropdown(); showBanner(query); applyState();
+  function commitSearch(q) {
+    if (!q) return;
+    activeSearch = q.toLowerCase();
+    closeDropdown(); showBanner(q); applyState();
   }
 
-  function highlight(text,query){
-    return esc(text).replace(new RegExp(`(${escRe(query)})`,'gi'),'<mark>$1</mark>');
-  }
-  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
-  function openDropdown(){ searchDropdown.hidden=false; searchInput.setAttribute('aria-expanded','true'); }
-  function closeDropdown(){ searchDropdown.hidden=true; searchInput.setAttribute('aria-expanded','false'); selectedIndex=-1; }
-  function clearSearch(){ searchInput.value=''; searchClear.hidden=true; activeSearch=''; closeDropdown(); hideBanner(); }
-  function showBanner(q){ if(!banner) return; banner.hidden=false; bannerTerm.textContent=q; }
-  function hideBanner(){ if(!banner) return; banner.hidden=true; }
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function hi(t,q) { return esc(t).replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<mark>$1</mark>'); }
+  function openDropdown()  { dropdown.hidden = false; }
+  function closeDropdown() { dropdown.hidden = true; selIdx = -1; }
+  function clearSearch()   { searchInput.value=''; searchClear.hidden=true; activeSearch=''; closeDropdown(); hideBanner(); }
+  function showBanner(q)   { if (!banner) return; banner.hidden=false; bannerTerm.textContent=q; }
+  function hideBanner()    { if (!banner) return; banner.hidden=true; }
 
 })();
 </script>

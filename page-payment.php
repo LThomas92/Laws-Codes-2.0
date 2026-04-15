@@ -4,84 +4,24 @@
  *
  * Stripe Integration — Deposit / Invoice Payment Page
  * ────────────────────────────────────────────────────
- * Setup:
- *  1. Install & activate the WP library via Composer or manually:
- *       composer require stripe/stripe-php
- *     or drop /vendor/stripe into your theme root.
- *
- *  2. Add to wp-config.php (NEVER commit real keys):
- *       define( 'STRIPE_SECRET_KEY',      'sk_live_...' );
- *       define( 'STRIPE_PUBLISHABLE_KEY', 'pk_live_...' );
- *       define( 'STRIPE_WEBHOOK_SECRET',  'whsec_...' );
- *
- *  3. In Stripe Dashboard → Developers → Webhooks:
- *       Add endpoint: https://yourdomain.com/?stripe_webhook=1
- *       Events to listen: payment_intent.succeeded, payment_intent.payment_failed
- *
- *  4. Create a page titled "Payment", apply this template.
- *     Link clients to: https://yourdomain.com/payment/?invoice=INV-001&amount=120000&desc=50%25+Deposit+Project
- *     (amount is in CENTS — e.g. 120000 = $1,200.00)
- *
- * ACF Fields (ACF > Field Groups > "Payment Page"):
- *   - payment_terms_note  (textarea)   short blurb shown under the form
- *   - stripe_logo_visible (true_false) show/hide Stripe badge
+ * lc_create_payment_intent() and lc_notify_payment_received() live in
+ * functions.php so the AJAX handler is registered on every request.
+ * Only lc_handle_stripe_webhook() stays here.
  */
 
-// ── Handle Stripe webhook (must run before any output) ─────────────────────
+// ── Handle Stripe webhook (must run before any output) ────────────────────────
 if ( isset( $_GET['stripe_webhook'] ) ) {
     lc_handle_stripe_webhook();
     exit;
 }
 
-// ── Process PaymentIntent creation via AJAX ────────────────────────────────
-add_action( 'wp_ajax_nopriv_lc_create_payment_intent', 'lc_create_payment_intent' );
-add_action( 'wp_ajax_lc_create_payment_intent',        'lc_create_payment_intent' );
-
-function lc_create_payment_intent() {
-    check_ajax_referer( 'lc_stripe_nonce', 'nonce' );
-
-    if ( ! defined( 'STRIPE_SECRET_KEY' ) ) {
-        wp_send_json_error( 'Stripe is not configured.' );
-    }
-
-    require_once get_template_directory() . '/vendor/autoload.php';
-    \Stripe\Stripe::setApiKey( STRIPE_SECRET_KEY );
-
-    $amount      = absint( $_POST['amount'] ?? 0 );
-    $description = sanitize_text_field( $_POST['description'] ?? 'Laws & Codes — Project Payment' );
-    $invoice_id  = sanitize_text_field( $_POST['invoice_id'] ?? '' );
-    $email       = sanitize_email( $_POST['email'] ?? '' );
-
-    if ( $amount < 50 ) { // Stripe minimum is $0.50
-        wp_send_json_error( 'Amount too low.' );
-    }
-
-    try {
-        $intent = \Stripe\PaymentIntent::create([
-            'amount'      => $amount,
-            'currency'    => 'usd',
-            'description' => $description,
-            'metadata'    => [
-                'invoice_id'  => $invoice_id,
-                'client_email' => $email,
-            ],
-            'receipt_email'        => $email ?: null,
-            'automatic_payment_methods' => [ 'enabled' => true ],
-        ]);
-
-        wp_send_json_success([
-            'clientSecret' => $intent->client_secret,
-            'intentId'     => $intent->id,
-        ]);
-    } catch ( \Stripe\Exception\ApiErrorException $e ) {
-        wp_send_json_error( $e->getMessage() );
-    }
-}
-
 function lc_handle_stripe_webhook() {
     if ( ! defined( 'STRIPE_SECRET_KEY' ) ) { http_response_code( 400 ); exit; }
 
-    require_once get_template_directory() . '/vendor/autoload.php';
+    $autoload = get_template_directory() . '/vendor/autoload.php';
+    if ( ! file_exists( $autoload ) ) { http_response_code( 400 ); exit; }
+    require_once $autoload;
+
     \Stripe\Stripe::setApiKey( STRIPE_SECRET_KEY );
 
     $payload = @file_get_contents( 'php://input' );
@@ -96,35 +36,23 @@ function lc_handle_stripe_webhook() {
 
     switch ( $event->type ) {
         case 'payment_intent.succeeded':
-            $intent = $event->data->object;
-            // Log or email notification:
-            lc_notify_payment_received( $intent );
+            lc_notify_payment_received( $event->data->object );
             break;
         case 'payment_intent.payment_failed':
-            // Optionally notify client
             break;
     }
 
     http_response_code( 200 );
-    echo json_encode([ 'received' => true ]);
+    echo json_encode( [ 'received' => true ] );
     exit;
 }
 
-function lc_notify_payment_received( $intent ) {
-    $to      = get_option('admin_email');
-    $amount  = number_format( $intent->amount / 100, 2 );
-    $invoice = $intent->metadata->invoice_id ?? 'N/A';
-    $client  = $intent->metadata->client_email ?? 'Unknown';
-    $subject = "💳 Payment received — \${$amount} · Invoice {$invoice}";
-    $body    = "A payment of \${$amount} USD was received.\n\nInvoice: {$invoice}\nClient: {$client}\nStripe ID: {$intent->id}";
-    wp_mail( $to, $subject, $body );
-}
-
 // ── URL params ────────────────────────────────────────────────────────────────
-$invoice_id  = sanitize_text_field( $_GET['invoice']  ?? '' );
-$amount_raw  = absint( $_GET['amount']  ?? 0 );   // in cents
+$invoice_id  = sanitize_text_field( $_GET['invoice'] ?? '' );
+$amount_raw  = absint( $_GET['amount'] ?? 0 );
 $description = sanitize_text_field( $_GET['desc'] ?? 'Laws & Codes — Project Payment' );
 $amount_fmt  = $amount_raw > 0 ? '$' . number_format( $amount_raw / 100, 2 ) : '';
+$is_paid     = isset( $_GET['paid'] ) && $_GET['paid'] === '1';
 
 get_header();
 ?>
@@ -135,10 +63,10 @@ get_header();
     <div class="payment-hero__inner">
       <div class="payment-hero__tag">
         <span class="payment-hero__dash"></span>
-        Secure Payment
+        <?php echo $is_paid ? 'Payment Complete' : 'Secure Payment'; ?>
       </div>
       <h1 class="payment-hero__h1">
-        <?php echo $invoice_id ? 'Invoice ' . esc_html( $invoice_id ) : 'Project Payment'; ?>
+        <?php echo $is_paid ? 'Payment received!' : ( $invoice_id ? 'Invoice ' . esc_html( $invoice_id ) : 'Project Payment' ); ?>
       </h1>
       <?php if ( $amount_fmt ) : ?>
         <div class="payment-hero__amount"><?php echo esc_html( $amount_fmt ); ?></div>
@@ -164,7 +92,8 @@ get_header();
           </div>
           <?php if ( $amount_fmt ) : ?>
           <div class="payment-summary__row payment-summary__row--total">
-            <span>Amount due</span><span><?php echo esc_html( $amount_fmt ); ?></span>
+            <span><?php echo $is_paid ? 'Amount paid' : 'Amount due'; ?></span>
+            <span><?php echo esc_html( $amount_fmt ); ?></span>
           </div>
           <?php endif; ?>
         </div>
@@ -184,20 +113,32 @@ get_header();
           </div>
         </div>
 
-        <?php
-        $terms_note = get_field('payment_terms_note');
-        if ( $terms_note ) : ?>
-          <p class="payment-summary__terms"><?php echo esc_html( $terms_note ); ?></p>
-        <?php else : ?>
-          <p class="payment-summary__terms">Payments are processed securely by Stripe. Your card details are never stored on our servers. 50% deposit required to begin; remaining 50% due upon completion.</p>
-        <?php endif; ?>
+        <?php $terms_note = get_field( 'payment_terms_note' ); ?>
+        <p class="payment-summary__terms">
+          <?php echo $terms_note
+            ? esc_html( $terms_note )
+            : 'Payments are processed securely by Stripe. Your card details are never stored on our servers. 50% deposit required to begin; remaining 50% due upon completion.';
+          ?>
+        </p>
       </div>
 
       <!-- RIGHT: Stripe Payment Form -->
       <div class="payment-form-wrap">
+
+        <?php if ( $is_paid ) : ?>
+        <!-- ── SUCCESS STATE (server-rendered on ?paid=1) ── -->
+        <div id="payment-success" class="payment-success">
+          <div class="payment-success__icon">&#10003;</div>
+          <h3>Payment received!</h3>
+          <p>Thank you &mdash; a receipt has been sent to your email. We&rsquo;ll be in touch shortly.</p>
+          <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="payment-success__home">Back to home</a>
+        </div>
+
+        <?php else : ?>
+        <!-- ── PAYMENT FORM ── -->
         <div class="payment-form-wrap__label">Pay securely</div>
 
-        <!-- Custom email field (before Stripe Elements mount) -->
+        <!-- Email -->
         <div class="payment-field" id="email-field">
           <label class="payment-field__label" for="payer-email">Your email (for receipt)</label>
           <input
@@ -210,14 +151,14 @@ get_header();
           >
         </div>
 
-        <!-- Stripe Elements mount point -->
+        <!-- Stripe Elements -->
         <div id="payment-element"></div>
 
-        <!-- Error message -->
+        <!-- Error -->
         <div id="payment-error" class="payment-error" role="alert" hidden></div>
 
         <!-- Submit -->
-        <button id="submit-payment" class="payment-submit" disabled>
+        <button id="submit-payment" class="payment-submit" type="button" disabled>
           <span id="submit-label">
             <?php echo $amount_fmt ? 'Pay ' . esc_html( $amount_fmt ) : 'Pay now'; ?>
           </span>
@@ -229,16 +170,18 @@ get_header();
           </span>
         </button>
 
-        <!-- Success state -->
-        <div id="payment-success" class="payment-success" hidden>
-          <div class="payment-success__icon">✓</div>
+        <!-- Success state (shown by JS after payment — fallback to server render above) -->
+        <div id="payment-success-js" class="payment-success" hidden>
+          <div class="payment-success__icon">&#10003;</div>
           <h3>Payment received!</h3>
-          <p>Thank you — a receipt has been sent to your email. We'll be in touch shortly.</p>
-          <a href="<?php echo esc_url( home_url('/') ); ?>" class="payment-success__home">Back to home</a>
+          <p>Thank you &mdash; a receipt has been sent to your email. We&rsquo;ll be in touch shortly.</p>
+          <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="payment-success__home">Back to home</a>
         </div>
 
+        <?php endif; ?>
+
         <!-- Stripe badge -->
-        <?php if ( get_field('stripe_logo_visible') !== false ) : ?>
+        <?php if ( get_field( 'stripe_logo_visible' ) !== false ) : ?>
         <div class="payment-stripe-badge">
           <svg viewBox="0 0 60 25" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Powered by Stripe" role="img">
             <path d="M5 9.7C5 7.7 6.7 7 8.6 7c2.6 0 4.2 1.4 4.2 1.4l-1.2 1.8S10.2 9 8.7 9c-.9 0-1.4.3-1.4.9 0 1.6 5.2 1 5.2 4.7C12.5 16.7 10.6 18 8.4 18 5.5 18 4 16.3 4 16.3l1.2-1.8S6.7 16 8.4 16c1 0 1.7-.4 1.7-1.1C10.1 13 5 13.4 5 9.7z" fill="#6772e5"/>
@@ -251,65 +194,61 @@ get_header();
           <span>Powered by Stripe</span>
         </div>
         <?php endif; ?>
-      </div>
 
+      </div><!-- /.payment-form-wrap -->
     </div>
   </section>
 
 </main>
 
-<!-- Stripe.js v3 -->
+<?php if ( ! $is_paid ) : ?>
+<!-- Stripe.js — only load on payment form, not on success page -->
 <script src="https://js.stripe.com/v3/"></script>
-
 <script>
-(function() {
-  const PUBLISHABLE_KEY = '<?php echo esc_js( defined('STRIPE_PUBLISHABLE_KEY') ? STRIPE_PUBLISHABLE_KEY : '' ); ?>';
-  const AJAX_URL        = '<?php echo esc_js( admin_url('admin-ajax.php') ); ?>';
-  const NONCE           = '<?php echo esc_js( wp_create_nonce('lc_stripe_nonce') ); ?>';
+(function () {
+  const PUBLISHABLE_KEY = '<?php echo esc_js( defined( 'STRIPE_PUBLISHABLE_KEY' ) ? STRIPE_PUBLISHABLE_KEY : '' ); ?>';
+  const AJAX_URL        = '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>';
+  const NONCE           = '<?php echo esc_js( wp_create_nonce( 'lc_stripe_nonce' ) ); ?>';
   const AMOUNT          = <?php echo intval( $amount_raw ); ?>;
   const INVOICE_ID      = '<?php echo esc_js( $invoice_id ); ?>';
   const DESCRIPTION     = '<?php echo esc_js( $description ); ?>';
   const RETURN_URL      = '<?php echo esc_js( get_permalink() . '?paid=1&invoice=' . urlencode( $invoice_id ) ); ?>';
 
+  const submitBtn   = document.getElementById( 'submit-payment' );
+  const submitLabel = document.getElementById( 'submit-label' );
+  const spinner     = document.getElementById( 'submit-spinner' );
+  const errorDiv    = document.getElementById( 'payment-error' );
+
   if ( ! PUBLISHABLE_KEY ) {
-    document.getElementById('payment-error').textContent = 'Payment is not yet configured. Please contact hello@lawscodes.com.';
-    document.getElementById('payment-error').hidden = false;
+    showError( 'Payment is not yet configured. Please contact hello@lawscodes.com.' );
     return;
   }
 
-  // If returning from 3DS redirect
-  const urlParams = new URLSearchParams(window.location.search);
-  if ( urlParams.get('paid') === '1' ) {
-    showSuccess();
+  if ( AMOUNT <= 0 ) {
+    showError( 'No payment amount specified. Please use the link provided in your invoice.' );
     return;
   }
 
-  const stripe   = Stripe(PUBLISHABLE_KEY);
-  let elements, paymentElement;
-  let clientSecret = null;
+  const stripe = Stripe( PUBLISHABLE_KEY );
+  let elements, clientSecret;
 
-  const submitBtn   = document.getElementById('submit-payment');
-  const submitLabel = document.getElementById('submit-label');
-  const spinner     = document.getElementById('submit-spinner');
-  const errorDiv    = document.getElementById('payment-error');
-
-  // Create PaymentIntent via WP AJAX then mount Elements
   async function init() {
     try {
-      const res = await fetch(AJAX_URL, {
-        method: 'POST',
+      const res = await fetch( AJAX_URL, {
+        method:  'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
+        body:    new URLSearchParams({
           action:      'lc_create_payment_intent',
           nonce:       NONCE,
           amount:      AMOUNT,
           description: DESCRIPTION,
           invoice_id:  INVOICE_ID,
-          email:       document.getElementById('payer-email').value,
+          email:       document.getElementById( 'payer-email' ).value,
         }),
       });
+
       const data = await res.json();
-      if ( ! data.success ) throw new Error(data.data || 'Could not initialize payment.');
+      if ( ! data.success ) throw new Error( data.data || 'Could not initialize payment.' );
 
       clientSecret = data.data.clientSecret;
 
@@ -329,10 +268,10 @@ get_header();
           },
           rules: {
             '.Input': {
-              border:     '1px solid rgba(7,9,69,0.12)',
-              boxShadow:  'none',
-              padding:    '12px 14px',
-              fontSize:   '14px',
+              border:    '1px solid rgba(7,9,69,0.12)',
+              boxShadow: 'none',
+              padding:   '12px 14px',
+              fontSize:  '14px',
             },
             '.Input:focus': {
               border:    '1.5px solid #070945',
@@ -350,60 +289,49 @@ get_header();
         },
       });
 
-      paymentElement = elements.create('payment');
-      paymentElement.mount('#payment-element');
-      paymentElement.on('ready', () => { submitBtn.disabled = false; });
+      const paymentElement = elements.create( 'payment' );
+      paymentElement.mount( '#payment-element' );
+      paymentElement.on( 'ready', () => { submitBtn.disabled = false; } );
 
-    } catch (err) {
-      showError(err.message);
+    } catch ( err ) {
+      showError( err.message );
     }
   }
 
-  // Lazily init when user fills email, or immediately if amount is pre-set
-  if ( AMOUNT > 0 ) {
-    init();
-  } else {
-    showError('No payment amount specified. Please use the link provided in your invoice.');
-  }
+  init();
 
-  // Submit
-  submitBtn.addEventListener('click', async () => {
+  submitBtn.addEventListener( 'click', async () => {
     if ( ! clientSecret ) return;
-    setLoading(true);
+    setLoading( true );
     errorDiv.hidden = true;
 
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url:           RETURN_URL,
-        receipt_email:        document.getElementById('payer-email').value,
+        return_url:    RETURN_URL,
+        receipt_email: document.getElementById( 'payer-email' ).value,
       },
     });
 
-    // confirmPayment only reaches here on error (redirect otherwise)
-    setLoading(false);
-    showError(error.message);
+    // Only reaches here if there's an error — successful payments redirect
+    setLoading( false );
+    showError( error.message );
   });
 
-  function setLoading(loading) {
+  function setLoading( loading ) {
     submitBtn.disabled = loading;
     submitLabel.hidden = loading;
     spinner.hidden     = ! loading;
   }
 
-  function showError(msg) {
+  function showError( msg ) {
     errorDiv.textContent = msg;
     errorDiv.hidden      = false;
     errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  function showSuccess() {
-    document.getElementById('payment-success').hidden = false;
-    document.getElementById('email-field').hidden     = true;
-    document.getElementById('payment-element').hidden = true;
-    document.getElementById('submit-payment').hidden  = true;
-  }
 })();
 </script>
+<?php endif; ?>
 
 <?php get_footer(); ?>
