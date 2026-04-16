@@ -2090,6 +2090,56 @@ body.menu-open {
   padding: 4px 10px;
 }
 
+.section-header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 36px;
+  gap: 16px;
+}
+
+.view-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--navy);
+  text-decoration: none;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--navy-border);
+  padding-bottom: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  align-self: flex-end;
+  transition: color 0.14s, border-color 0.14s;
+}
+.view-all-btn:hover {
+  color: var(--tan2);
+  border-color: var(--tan2);
+}
+
+.section-kicker {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--tan2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 400;
+  color: var(--navy);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
 .project-hero {
   background: #ffffff;
   padding: 52px 48px 0;

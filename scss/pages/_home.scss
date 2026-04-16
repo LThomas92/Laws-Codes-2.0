@@ -83,3 +83,61 @@
   border-radius:   4px;
   padding:         4px 10px;
 }
+
+
+// ─── Case studies section header row ─────────────────────────────────────────
+// Puts heading on the left, "View all" link on the right
+
+.section-header-row {
+  display:         flex;
+  align-items:     flex-end;
+  justify-content: space-between;
+  margin-bottom:   36px;
+  gap:             16px;
+}
+
+.view-all-btn {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             6px;
+  font-family:     var(--mono);
+  font-size:       11px;
+  color:           var(--navy);
+  text-decoration: none;
+  letter-spacing:  .07em;
+  text-transform:  uppercase;
+  border-bottom:   1px solid var(--navy-border);
+  padding-bottom:  2px;
+  white-space:     nowrap;
+  flex-shrink:     0;
+  align-self:      flex-end;  // aligns to bottom of heading on the left
+  transition:      color .14s, border-color .14s;
+
+  &:hover {
+    color:         var(--tan2);
+    border-color:  var(--tan2);
+  }
+}
+
+
+// ─── Section kicker + title (homepage sections) ───────────────────────────────
+
+.section-kicker {
+  font-family:    var(--mono);
+  font-size:      10px;
+  color:          var(--tan2);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight:    700;
+  margin-bottom:  10px;
+}
+
+.section-title {
+  font-family:    var(--serif);
+  font-size:      clamp(32px, 4vw, 52px);
+  font-weight:    400;
+  color:          var(--navy);
+  line-height:    1.08;
+  letter-spacing: -.02em;
+  margin:         0;
+}
