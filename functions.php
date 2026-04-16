@@ -400,6 +400,9 @@ add_action( 'wp_ajax_lc_quiz_lead',        'lc_handle_quiz_lead' );
 // ── GLOBAL SEARCH AJAX ────────────────────────────────────
 require_once LC_DIR . '/inc/search-ajax.php';
 
+// ── SOCIAL META TAGS ──────────────────────────────────────
+require_once LC_DIR . '/inc/social-meta.php';
+
 // ── STRIPE: Payment Intent (moved here from page-payment.php) ─────────────────
 // Must live in functions.php so the AJAX handler is registered on every
 // request — not just when the payment page template loads.

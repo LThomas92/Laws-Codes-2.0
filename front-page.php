@@ -132,6 +132,9 @@ get_header();
             <?php echo esc_html( $first['initials'] ?? '' ); ?>
           </span>
         <?php endif; ?>
+        <span class="featured-card-cat" id="lc-feat-cat">
+          <?php echo esc_html( trim( explode( ',', $first['categoryLabel'] ?? '' )[0] ) ); ?>
+        </span>
       </div>
       <div class="featured-card-body">
         <div class="featured-card-title" id="lc-feat-title">
@@ -139,6 +142,21 @@ get_header();
         </div>
         <div class="featured-card-industry" id="lc-feat-industry">
           <?php echo esc_html( implode( ' · ', array_filter( [ $first['industry'] ?? '', $first['location'] ?? '' ] ) ) ); ?>
+        </div>
+        <div class="featured-card-kpis">
+          <div class="feat-kpi">
+            <div class="feat-kpi-number" id="lc-feat-kpi1-n"><?php echo esc_html( $first['kpi1Num']   ?? '' ); ?></div>
+            <div class="feat-kpi-label"  id="lc-feat-kpi1-l"><?php echo esc_html( $first['kpi1Label'] ?? '' ); ?></div>
+          </div>
+          <div class="feat-kpi">
+            <div class="feat-kpi-number" id="lc-feat-kpi2-n"><?php echo esc_html( $first['kpi2Num']   ?? '' ); ?></div>
+            <div class="feat-kpi-label"  id="lc-feat-kpi2-l"><?php echo esc_html( $first['kpi2Label'] ?? '' ); ?></div>
+          </div>
+        </div>
+        <div class="feat-pills" id="lc-feat-pills">
+          <?php foreach ( ( $first['techStack'] ?? [] ) as $tech ) : ?>
+            <span class="feat-pill"><?php echo esc_html( $tech ); ?></span>
+          <?php endforeach; ?>
         </div>
       </div>
     </div>
@@ -173,7 +191,7 @@ get_header();
       <div class="section-kicker">Selected work</div>
       <h2 class="section-title">Case studies</h2>
     </div>
-    <a href="<?php echo esc_url( home_url( '/work/' ) ); ?>" class="view-all-btn">View all case studies &rarr;</a>
+    <a href="<?php echo esc_url( home_url( '/work/' ) ); ?>" class="view-all-btn">View all projects &rarr;</a>
   </div>
 
   <?php $hp_query = new WP_Query(['post_type'=>'lc_case_study','posts_per_page'=>6,'post_status'=>'publish','orderby'=>'menu_order','order'=>'ASC']); ?>
@@ -249,7 +267,8 @@ get_header();
   <p class="section-sub">Four focused phases — no hand-holding required.</p>
   <div class="process-grid" style="margin-top:36px">
     <?php foreach ( [['01','Discovery','Brand deep-dive, competitor audit, goals alignment and kickoff workshop'],['02','Design','Wireframes, high-fidelity mockups, iterated until every pixel is right'],['03','Build','Custom development, integrations, cross-device QA and performance testing'],['04','Launch','Go live, team training, handoff, and 30 days of post-launch support']] as [$n,$title,$desc] ) : ?>
-      <div class="process-card" data-step="<?php echo esc_attr($n); ?>">
+      <div class="process-card">
+        <div class="process-step-num" aria-hidden="true"><?php echo esc_html($n); ?></div>
         <div class="process-dot"></div>
         <div class="process-title"><?php echo esc_html($title); ?></div>
         <p class="process-desc"><?php echo esc_html($desc); ?></p>
