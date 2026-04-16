@@ -1,5 +1,5 @@
-# Open .gitignore and add these lines
 node_modules/
+vendor/
 dist/
 *.log
 .DS_Store
