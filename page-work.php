@@ -105,11 +105,22 @@ $sub     = $hero['hero_subtext']     ?? 'Every project is a partnership — buil
         $link        = get_permalink();
         $title       = get_the_title();
         $desc        = get_field('cs_description') ?: '';
+        $thumb_img   = get_field('cs_thumbnail') ?: null;   // ACF Image Array
+        $thumb_url   = $thumb_img['sizes']['lc-project-hero'] ?? ( $thumb_img['url'] ?? '' );
 
         // Normalise filter tags: always include 'all', strip spaces around commas
-        $filter_arr    = array_filter(array_map('trim', explode(',', $filter_tags)));
+        // If cs_filter_tags is empty, auto-derive from cs_tags as a fallback
+        if ( empty( $filter_tags ) || $filter_tags === 'all' ) {
+            // Auto-generate slugs from display tags
+            $auto = array_filter( array_map( function( $t ) {
+                return strtolower( preg_replace( '/[^a-z0-9]/', '', strtolower( trim( $t ) ) ) );
+            }, explode( ',', $tags_raw ) ) );
+            $filter_arr = $auto ?: [];
+        } else {
+            $filter_arr = array_filter( array_map( 'trim', explode( ',', $filter_tags ) ) );
+        }
         $filter_arr[]  = 'all';
-        $filter_string = implode(',', array_unique($filter_arr));
+        $filter_string = implode( ',', array_unique( $filter_arr ) );
       ?>
       <article
         class="cs-item"
@@ -120,9 +131,18 @@ $sub     = $hero['hero_subtext']     ?? 'Every project is a partnership — buil
       >
         <a class="cs-item__link" href="<?php echo esc_url($link); ?>" aria-label="View <?php echo esc_attr($title); ?> case study">
 
-          <!-- Coloured thumbnail -->
-          <div class="cs-item__thumb" style="background:<?php echo esc_attr($bg); ?>">
-            <span class="cs-item__initials" aria-hidden="true"><?php echo esc_html($initials); ?></span>
+          <!-- Thumbnail: image if set, else branded colour panel -->
+          <div class="cs-item__thumb<?php echo $thumb_url ? ' cs-item__thumb--has-img' : ''; ?>"
+               style="background:<?php echo esc_attr($bg); ?>">
+            <?php if ($thumb_url) : ?>
+              <img src="<?php echo esc_url($thumb_url); ?>"
+                   alt="<?php echo esc_attr($title); ?> screenshot"
+                   class="cs-item__thumb-img"
+                   loading="lazy"
+                   decoding="async">
+            <?php else : ?>
+              <span class="cs-item__initials" aria-hidden="true"><?php echo esc_html($initials); ?></span>
+            <?php endif; ?>
             <?php if ($kpi_n) : ?>
             <div class="cs-item__kpi">
               <span class="cs-item__kpi-n"><?php echo esc_html($kpi_n); ?></span>
@@ -208,7 +228,8 @@ const LC_PROJECTS = <?php echo wp_json_encode($cs_search_data); ?>;
 
   // ── Filter buttons ──────────────────────────────────────────────────────────
   const filterBtns  = document.querySelectorAll('.work-filter');
-  const csItems     = document.querySelectorAll('.cs-item');
+  const csGrid      = document.getElementById('cs-grid');
+  const csItems     = csGrid ? csGrid.querySelectorAll('.cs-item') : document.querySelectorAll('.cs-item');
   const csEmpty     = document.getElementById('cs-empty');
   const emptyReset  = document.getElementById('cs-empty-reset');
 
@@ -231,8 +252,7 @@ const LC_PROJECTS = <?php echo wp_json_encode($cs_search_data); ?>;
   function applyState() {
     let visible = 0;
     csItems.forEach(item => {
-      // data-tags is already normalised: "all,wordpress,ecommerce" etc.
-      const itemTags = item.dataset.tags ? item.dataset.tags.split(',') : ['all'];
+      const itemTags = item.dataset.tags ? item.dataset.tags.split(',').map(t => t.trim()) : ['all'];
 
       const filterOK = activeFilter === 'all' || itemTags.includes(activeFilter);
       const searchOK = activeSearch === '' ||
@@ -241,10 +261,14 @@ const LC_PROJECTS = <?php echo wp_json_encode($cs_search_data); ?>;
         (item.dataset.tagsText || '').includes(activeSearch);
 
       const show = filterOK && searchOK;
-      item.hidden = !show;
+      // Use display:none — more reliable than hidden attribute inside CSS grid
+      item.style.display = show ? '' : 'none';
       if (show) visible++;
     });
-    if (csEmpty) csEmpty.hidden = visible > 0;
+    // Show empty state only when truly zero visible AND a filter/search is active
+    if (csEmpty) {
+      csEmpty.hidden = visible > 0 || (activeFilter === 'all' && activeSearch === '');
+    }
   }
 
   // ── Filter buttons ──────────────────────────────────────────────────────────

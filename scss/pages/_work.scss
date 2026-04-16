@@ -109,9 +109,6 @@
   display:               grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap:                   16px;
-  &--home {
-    margin-top: 2rem;
-  }
 }
 
 // The article itself has no visual — the <a> inside is the card
@@ -145,13 +142,14 @@
 
 // Coloured top panel with initials + KPI
 .cs-item__thumb {
-  position:   relative;
-  height:     140px;
-  display:    flex;
-  align-items: center;
+  position:        relative;
+  height:          180px;       // taller panel = more of the screenshot visible
+  display:         flex;
+  align-items:     center;
   justify-content: space-between;
-  padding:    20px 22px;
-  transition: filter .18s;
+  padding:         20px 22px;
+  overflow:        hidden;
+  transition:      filter .18s;
 }
 
 .cs-item__initials {
@@ -162,6 +160,40 @@
   line-height: 1;
   letter-spacing: -.01em;
 }
+
+// When a thumbnail image is present
+.cs-item__thumb--has-img {
+  padding: 0;   // remove padding so image fills edge to edge
+}
+
+.cs-item__thumb-img {
+  position:        absolute;
+  inset:           0;
+  width:           100%;
+  height:          100%;
+  object-fit:      cover;
+  object-position: top center;  // anchor to top so site header is always visible
+  display:         block;
+  transition:      transform .3s ease;
+}
+
+// KPI overlay sits on top of the image
+.cs-item__thumb--has-img .cs-item__kpi {
+  position:         absolute;
+  bottom:           14px;
+  right:            16px;
+  background:       rgba(0, 0, 0, .55);
+  backdrop-filter:  blur(8px);
+  border-radius:    6px;
+  padding:          6px 12px;
+  text-align:       right;
+}
+
+.cs-item__thumb--has-img .cs-item__kpi-n { color: rgba(255,255,255,.95); }
+.cs-item__thumb--has-img .cs-item__kpi-l { color: rgba(255,255,255,.6); }
+
+// Subtle zoom on hover
+.cs-item__link:hover .cs-item__thumb-img { transform: scale(1.04); }
 
 .cs-item__kpi {
   text-align: right;
@@ -264,6 +296,12 @@
   color:       var(--muted);
   text-align:  center;
   padding:     48px;
+}
+
+// Items hidden by JS filter use display:none — ensure no ghost space in grid
+.cs-item[style*="display: none"],
+.cs-item[style*="display:none"] {
+  display: none !important;
 }
 
 
@@ -633,24 +671,27 @@
 
 @media (max-width: 768px) {
   .work-toolbar {
-    padding:    0 16px;
-    gap:        0;
-    flex-direction: column;
-    align-items: stretch;
+    padding:         0 16px;
+    gap:             8px;
+    flex-direction:  column;
+    align-items:     center;   // centre search + filters on mobile
   }
 
   .work-filters {
+    width:         100%;
     border-bottom: 1px solid var(--navy-border);
     padding:       0;
+    justify-content: center;   // centre filter pills
+    flex-wrap:     wrap;
   }
 
   .work-search {
     width:   100%;
-    padding: 10px 0;
+    padding: 8px 0;
   }
 
-  .cs-item__link { grid-template-columns: 60px 1fr auto; }
-  .cs-thumb      { min-height: 80px; font-size: 10px; }
+  // keep the search input itself centred inside its full-width container
+  .work-search__wrap { width: 100%; }
 }
 
 

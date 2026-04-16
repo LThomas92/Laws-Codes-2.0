@@ -556,3 +556,22 @@ add_filter( 'image_size_names_choose', function ( $sizes ) {
 add_filter( 'document_title_separator', fn() => '—' );
 add_filter( 'excerpt_length',           fn() => 28 );
 add_filter( 'excerpt_more',             fn() => '...' );
+
+// ── FOOTER NAV WALKER ─────────────────────────────────────
+// Outputs plain <a class="footer-link"> instead of <ul><li><a>
+// Must live in functions.php so it's defined before footer.php loads.
+if ( ! class_exists( 'LC_Footer_Walker' ) ) :
+class LC_Footer_Walker extends Walker_Nav_Menu {
+    public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
+        $url    = $item->url    ?? '#';
+        $title  = $item->title  ?? '';
+        $target = ! empty( $item->target ) ? ' target="' . esc_attr( $item->target ) . '"' : '';
+        $rel    = ! empty( $item->xfn )    ? ' rel="'    . esc_attr( $item->xfn )    . '"' : '';
+        $output .= '<a href="' . esc_url( $url ) . '" class="footer-link"' . $target . $rel . '>'
+                 . esc_html( $title ) . '</a>' . "\n";
+    }
+    public function start_lvl( &$output, $depth = 0, $args = null ) {}
+    public function end_lvl(   &$output, $depth = 0, $args = null ) {}
+    public function end_el(    &$output, $item, $depth = 0, $args = null ) {}
+}
+endif;

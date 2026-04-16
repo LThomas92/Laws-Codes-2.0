@@ -2026,50 +2026,68 @@ body.menu-open {
     height: 18px;
   }
 }
-.projects-section {
-  padding: 72px 48px;
-}
-.projects-section .section-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 0;
-}
-.projects-section .view-all-btn {
-  font-family: "Space Mono", "Courier New", monospace;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #6b6b7e;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: all 0.12s ease;
-}
-.projects-section .view-all-btn:hover {
-  color: #070945;
+.hero-title {
+  font-size: clamp(44px, 5.5vw, 80px);
 }
 
-.process-section {
-  padding: 64px 48px;
-  background: #f9f8f5;
-  border-top: 1px solid rgba(7, 9, 69, 0.11);
-  border-bottom: 1px solid rgba(7, 9, 69, 0.11);
+.hero-sub {
+  max-width: min(540px, 100%);
+  font-size: clamp(14px, 1.1vw, 17px);
 }
-@media (max-width: 768px) {
-  .process-section {
-    padding: 48px 24px;
+
+.cs-grid--home {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+@media (min-width: 1280px) {
+  .cs-grid--home {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-.testi-section {
-  padding: 72px 48px;
-  border-top: 1px solid rgba(7, 9, 69, 0.11);
-}
 @media (max-width: 768px) {
-  .testi-section {
-    padding: 48px 24px;
+  .work-search {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
+  .work-search__wrap {
+    width: 100%;
+  }
+  .work-search__dropdown {
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+}
+.featured-card-img {
+  position: relative;
+  overflow: hidden;
+}
+
+.featured-card-img__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+  -o-object-position: top center;
+     object-position: top center;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.featured-card:hover .featured-card-img__photo {
+  transform: scale(1.03);
+}
+
+.featured-card-img--has-img .featured-card-cat {
+  position: relative;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  border-radius: 4px;
+  padding: 4px 10px;
 }
 
 .project-hero {
@@ -5146,9 +5164,6 @@ body.menu-open {
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 16px;
 }
-.cs-grid--home {
-  margin-top: 2rem;
-}
 
 .cs-item {
   display: block;
@@ -5185,11 +5200,12 @@ body.menu-open {
 
 .cs-item__thumb {
   position: relative;
-  height: 140px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 20px 22px;
+  overflow: hidden;
   transition: filter 0.18s;
 }
 
@@ -5200,6 +5216,46 @@ body.menu-open {
   color: rgba(255, 255, 255, 0.2);
   line-height: 1;
   letter-spacing: -0.01em;
+}
+
+.cs-item__thumb--has-img {
+  padding: 0;
+}
+
+.cs-item__thumb-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+  -o-object-position: top center;
+     object-position: top center;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.cs-item__thumb--has-img .cs-item__kpi {
+  position: absolute;
+  bottom: 14px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+  padding: 6px 12px;
+  text-align: right;
+}
+
+.cs-item__thumb--has-img .cs-item__kpi-n {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.cs-item__thumb--has-img .cs-item__kpi-l {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.cs-item__link:hover .cs-item__thumb-img {
+  transform: scale(1.04);
 }
 
 .cs-item__kpi {
@@ -5306,6 +5362,11 @@ body.menu-open {
   color: var(--muted);
   text-align: center;
   padding: 48px;
+}
+
+.cs-item[style*="display: none"],
+.cs-item[style*="display:none"] {
+  display: none !important;
 }
 
 .tgrid {
@@ -5653,24 +5714,23 @@ body.menu-open {
 @media (max-width: 768px) {
   .work-toolbar {
     padding: 0 16px;
-    gap: 0;
+    gap: 8px;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
   }
   .work-filters {
+    width: 100%;
     border-bottom: 1px solid var(--navy-border);
     padding: 0;
+    justify-content: center;
+    flex-wrap: wrap;
   }
   .work-search {
     width: 100%;
-    padding: 10px 0;
+    padding: 8px 0;
   }
-  .cs-item__link {
-    grid-template-columns: 60px 1fr auto;
-  }
-  .cs-thumb {
-    min-height: 80px;
-    font-size: 10px;
+  .work-search__wrap {
+    width: 100%;
   }
 }
 @media (max-width: 600px) {

@@ -1,51 +1,85 @@
-// ============================================================
-// LAWS & CODES — HOME PAGE STYLES
-// ============================================================
-@use '../base/variables' as *;
+// =============================================================================
+// HOMEPAGE  —  _homepage.scss
+// Laws & Codes · lawscodes.com
+// =============================================================================
 
-.home-hero { } // extends .hero from components
 
-// Project section
-.projects-section {
-  padding: $space-18 $container-pad;
+// ─── Hero — removed max-width cap, restored original layout ──────────────────
+// No max-width, no forced grid, no padding overrides here.
+// The hero layout is controlled entirely by the existing theme CSS.
+// Only the title/sub scaling is kept since that was a genuine improvement.
 
-  .section-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 0;
-  }
+.hero-title {
+  font-size: clamp(44px, 5.5vw, 80px);
+}
 
-  .view-all-btn {
-    @include mono-label;
-    color: $muted;
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: $transition-fast;
+.hero-sub {
+  max-width: min(540px, 100%);
+  font-size: clamp(14px, 1.1vw, 17px);
+}
 
-    &:hover { color: $navy; }
+
+// ─── Homepage case study grid ─────────────────────────────────────────────────
+
+.cs-grid--home {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-// Process section
-.process-section {
-  padding: $space-16 $container-pad;
-  background: $off-white;
-  border-top: 1px solid $navy-border;
-  border-bottom: 1px solid $navy-border;
 
-  @include bp-md {
-    padding: $space-12 $container-pad-mobile;
+// ─── Search bar mobile centering (work page toolbar) ─────────────────────────
+
+@media (max-width: 768px) {
+  .work-search {
+    display:        flex;
+    flex-direction: column;
+    align-items:    center;
+  }
+
+  .work-search__wrap {
+    width: 100%;
+  }
+
+  .work-search__dropdown {
+    left:  0;
+    right: 0;
+    width: 100%;
   }
 }
 
-// Testimonials section
-.testi-section {
-  padding: $space-18 $container-pad;
-  border-top: 1px solid $navy-border;
 
-  @include bp-md {
-    padding: $space-12 $container-pad-mobile;
-  }
+// ─── Featured card thumbnail image ───────────────────────────────────────────
+
+.featured-card-img {
+  position: relative;
+  overflow: hidden;
+}
+
+.featured-card-img__photo {
+  position:        absolute;
+  inset:           0;
+  width:           100%;
+  height:          100%;
+  object-fit:      cover;
+  object-position: top center;  // anchor to top so header of site is always visible
+  display:         block;
+  transition:      transform .4s ease;
+}
+
+// Subtle zoom on hover
+.featured-card:hover .featured-card-img__photo {
+  transform: scale(1.03);
+}
+
+// Category badge readable over image
+.featured-card-img--has-img .featured-card-cat {
+  position:        relative;
+  z-index:         2;
+  background:      rgba(0, 0, 0, .5);
+  backdrop-filter: blur(6px);
+  border-radius:   4px;
+  padding:         4px 10px;
 }

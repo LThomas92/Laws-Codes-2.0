@@ -1,1 +1,6 @@
-vendor/
+# Open .gitignore and add these lines
+node_modules/
+dist/
+*.log
+.DS_Store
+wp-config.php
