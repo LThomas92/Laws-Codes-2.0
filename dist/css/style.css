@@ -3831,8 +3831,8 @@ body.menu-open {
   margin-bottom: 24px;
 }
 .about-founder__sig {
-  height: 36px;
-  width: auto;
+  height: auto;
+  width: 100%;
   opacity: 0.7;
   filter: invert(0%);
 }
@@ -5042,7 +5042,6 @@ body.menu-open {
   transition: background 0.12s, border-color 0.12s;
 }
 .svc-card__cta:hover {
-  background: var(--navy-light);
   border-color: var(--navy);
 }
 
