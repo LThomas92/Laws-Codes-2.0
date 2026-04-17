@@ -3833,6 +3833,7 @@ body.menu-open {
 .about-founder__sig {
   height: auto;
   width: 100%;
+  max-width: 175px;
   opacity: 0.7;
   filter: invert(0%);
 }
