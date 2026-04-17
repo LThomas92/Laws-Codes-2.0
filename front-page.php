@@ -31,14 +31,6 @@ function lc_get_featured_case_studies(): array {
             $query->the_post();
             $id = get_the_ID();
 
-            // KPIs — read repeater rows, fallback to empty string
-            // Use ?: not ?? because get_field returns '' not null when empty
-            $kpis_rep   = get_field( 'cs_kpis', $id ) ?: [];
-            $kpi1_num   = ( ! empty( $kpis_rep[0]['kpi_number'] ) ) ? $kpis_rep[0]['kpi_number'] : ( get_field( 'cs_kpi_number',  $id ) ?: '' );
-            $kpi1_label = ( ! empty( $kpis_rep[0]['kpi_label']  ) ) ? $kpis_rep[0]['kpi_label']  : ( get_field( 'cs_kpi_label',   $id ) ?: '' );
-            $kpi2_num   = ( ! empty( $kpis_rep[1]['kpi_number'] ) ) ? $kpis_rep[1]['kpi_number'] : ( get_field( 'cs_kpi2_number', $id ) ?: '' );
-            $kpi2_label = ( ! empty( $kpis_rep[1]['kpi_label']  ) ) ? $kpis_rep[1]['kpi_label']  : ( get_field( 'cs_kpi2_label',  $id ) ?: '' );
-
             $stack_raw = get_field( 'cs_tech_stack', $id ) ?: get_field( 'cs_tags', $id ) ?: '';
             $stack     = array_filter( array_map( 'trim', explode( ',', (string) $stack_raw ) ) );
 
@@ -84,7 +76,7 @@ get_header();
   <div class="hero-left">
     <div class="hero-eyebrow">
       <span class="hero-eyebrow-dash"></span>
-      <span><?php echo esc_html( $heroTag ); ?></span>
+      <span>Web development · New York</span>
     </div>
     <h1 class="hero-title">
       Make your<br>business<br><em>impossible</em><br>to ignore.
@@ -143,16 +135,7 @@ get_header();
         <div class="featured-card-industry" id="lc-feat-industry">
           <?php echo esc_html( implode( ' · ', array_filter( [ $first['industry'] ?? '', $first['location'] ?? '' ] ) ) ); ?>
         </div>
-        <div class="featured-card-kpis">
-          <div class="feat-kpi">
-            <div class="feat-kpi-number" id="lc-feat-kpi1-n"><?php echo esc_html( $first['kpi1Num']   ?? '' ); ?></div>
-            <div class="feat-kpi-label"  id="lc-feat-kpi1-l"><?php echo esc_html( $first['kpi1Label'] ?? '' ); ?></div>
-          </div>
-          <div class="feat-kpi">
-            <div class="feat-kpi-number" id="lc-feat-kpi2-n"><?php echo esc_html( $first['kpi2Num']   ?? '' ); ?></div>
-            <div class="feat-kpi-label"  id="lc-feat-kpi2-l"><?php echo esc_html( $first['kpi2Label'] ?? '' ); ?></div>
-          </div>
-        </div>
+       
         <div class="feat-pills" id="lc-feat-pills">
           <?php foreach ( ( $first['techStack'] ?? [] ) as $tech ) : ?>
             <span class="feat-pill"><?php echo esc_html( $tech ); ?></span>
@@ -191,7 +174,7 @@ get_header();
       <div class="section-kicker">Selected work</div>
       <h2 class="section-title">Case studies</h2>
     </div>
-    <a href="<?php echo esc_url( home_url( '/work/' ) ); ?>" class="view-all-btn">View all projects &rarr;</a>
+    <a href="<?php echo esc_url( home_url( '/work/' ) ); ?>" class="view-all-btn">View all case studies &rarr;</a>
   </div>
 
   <?php $hp_query = new WP_Query(['post_type'=>'lc_case_study','posts_per_page'=>6,'post_status'=>'publish','orderby'=>'menu_order','order'=>'ASC']); ?>
@@ -247,7 +230,7 @@ get_header();
           <?php if ( $desc ) : ?><p class="cs-item__desc"><?php echo esc_html( $desc ); ?></p><?php endif; ?>
         </div>
         <div class="cs-item__cta" aria-hidden="true">
-          <span class="cs-item__cta-text">View project</span>
+          <span class="cs-item__cta-text">View case study</span>
           <span class="cs-item__arrow">&#8594;</span>
         </div>
       </a>

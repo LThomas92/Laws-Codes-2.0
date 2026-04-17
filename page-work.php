@@ -63,7 +63,7 @@ $sub     = $hero['hero_subtext']     ?? 'Every project is a partnership — buil
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <input class="work-search__input" id="cs-search-input" type="search"
-          placeholder="Search projects..." autocomplete="off" aria-label="Search projects">
+          placeholder="Search case studies..." autocomplete="off" aria-label="Search case studies">
         <button class="work-search__clear" id="cs-search-clear" type="button" aria-label="Clear search" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -167,7 +167,7 @@ $sub     = $hero['hero_subtext']     ?? 'Every project is a partnership — buil
 
           <!-- Arrow CTA -->
           <div class="cs-item__cta" aria-hidden="true">
-            <span class="cs-item__cta-text">View project</span>
+            <span class="cs-item__cta-text">View case study</span>
             <span class="cs-item__arrow">&#8594;</span>
           </div>
 
